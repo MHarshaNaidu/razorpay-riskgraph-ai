@@ -66,29 +66,28 @@ REVIEW_THRESHOLD = 75
 
 
 # ============================================================
-# GLOBAL CSS
-# ONLY CSS HERE — NO HTML UI COMPONENTS
+# THEME / CSS
 # ============================================================
 
 st.markdown(
     """
     <style>
 
-    /* ======================================================
-       GLOBAL
-       ====================================================== */
+    /* ========================================================
+       MAIN APPLICATION
+       ======================================================== */
 
     .stApp {
-        background-color: #ffffff;
+        background: #ffffff;
         color: #111111;
     }
 
     [data-testid="stAppViewContainer"] {
-        background-color: #ffffff;
+        background: #ffffff;
     }
 
     [data-testid="stHeader"] {
-        background-color: #ffffff;
+        background: #ffffff;
     }
 
     .block-container {
@@ -97,130 +96,341 @@ st.markdown(
         padding-bottom: 4rem;
     }
 
-    h1, h2, h3, h4 {
+    h1,
+    h2,
+    h3,
+    h4 {
         color: #111111 !important;
         font-family: Arial, Helvetica, sans-serif !important;
         font-weight: 800 !important;
     }
 
-    p, label {
-        color: #333333;
+    p {
+        color: #444444;
     }
 
 
-    /* ======================================================
+    /* ========================================================
        SIDEBAR
-       ====================================================== */
+       ======================================================== */
 
     section[data-testid="stSidebar"] {
-        background-color: #111111;
-        border-right: 1px solid #2b2b2b;
+        background: #111111 !important;
+        border-right: 1px solid #292929;
+    }
+
+    section[data-testid="stSidebar"] * {
+        color: #ffffff;
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
+        color: #ffffff !important;
+    }
+
+    section[data-testid="stSidebar"] label {
+        color: #ffffff !important;
+    }
+
+    section[data-testid="stSidebar"] p {
+        color: #dddddd !important;
     }
 
     section[data-testid="stSidebar"] h1,
     section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3,
-    section[data-testid="stSidebar"] label,
-    section[data-testid="stSidebar"] p {
+    section[data-testid="stSidebar"] h3 {
         color: #ffffff !important;
     }
 
-    section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
-        color: #ffffff;
+
+    /* ========================================================
+       SIDEBAR METRIC CARDS
+       ======================================================== */
+
+    section[data-testid="stSidebar"]
+    [data-testid="stMetric"] {
+
+        background: #ffffff !important;
+
+        border: 1px solid #dddddd !important;
+
+        border-radius: 12px !important;
+
+        padding: 16px !important;
+
+        margin-top: 8px !important;
+
+        margin-bottom: 8px !important;
+
+        box-shadow:
+            0 4px 14px
+            rgba(0, 0, 0, 0.20) !important;
     }
 
+    /* Sidebar metric label */
 
-    /* ======================================================
-       BUTTONS
-       ====================================================== */
+    section[data-testid="stSidebar"]
+    [data-testid="stMetricLabel"] {
 
-    .stButton > button {
-        background-color: #ff7900 !important;
-        color: #ffffff !important;
-        border: 1px solid #ff7900 !important;
-        border-radius: 8px !important;
+        color: #555555 !important;
+
+        background: transparent !important;
+
         font-weight: 700 !important;
-        min-height: 42px;
     }
 
-    .stButton > button:hover {
-        background-color: #e96800 !important;
-        border-color: #e96800 !important;
-        color: #ffffff !important;
+    section[data-testid="stSidebar"]
+    [data-testid="stMetricLabel"] * {
+
+        color: #555555 !important;
+
+        background: transparent !important;
+    }
+
+    section[data-testid="stSidebar"]
+    [data-testid="stMetricLabel"] p {
+
+        color: #555555 !important;
+
+        background: transparent !important;
+    }
+
+    /* Sidebar metric value */
+
+    section[data-testid="stSidebar"]
+    [data-testid="stMetricValue"] {
+
+        color: #111111 !important;
+
+        background: transparent !important;
+
+        font-weight: 800 !important;
+    }
+
+    section[data-testid="stSidebar"]
+    [data-testid="stMetricValue"] * {
+
+        color: #111111 !important;
+
+        background: transparent !important;
+    }
+
+    section[data-testid="stSidebar"]
+    [data-testid="stMetricValue"] div {
+
+        color: #111111 !important;
+
+        background: transparent !important;
+    }
+
+    /* Sidebar metric delta */
+
+    section[data-testid="stSidebar"]
+    [data-testid="stMetricDelta"] {
+
+        color: #555555 !important;
+
+        background: transparent !important;
+    }
+
+    section[data-testid="stSidebar"]
+    [data-testid="stMetricDelta"] * {
+
+        color: #555555 !important;
+
+        background: transparent !important;
     }
 
 
-    /* ======================================================
-       METRICS
-       ====================================================== */
+    /* ========================================================
+       MAIN METRIC CARDS
+       ======================================================== */
 
     [data-testid="stMetric"] {
-        background-color: #ffffff;
-        border: 1px solid #e4e4e4;
-        border-radius: 12px;
-        padding: 16px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+
+        background: #ffffff !important;
+
+        border: 1px solid #e5e5e5 !important;
+
+        border-radius: 12px !important;
+
+        padding: 18px !important;
+
+        box-shadow:
+            0 4px 16px
+            rgba(0, 0, 0, 0.05) !important;
     }
 
     [data-testid="stMetricLabel"] {
-        color: #777777 !important;
+
+        color: #555555 !important;
+
+        background: transparent !important;
+
         font-weight: 700 !important;
     }
 
+    [data-testid="stMetricLabel"] * {
+
+        color: #555555 !important;
+
+        background: transparent !important;
+    }
+
+    [data-testid="stMetricLabel"] p {
+
+        color: #555555 !important;
+
+        background: transparent !important;
+    }
+
     [data-testid="stMetricValue"] {
+
         color: #111111 !important;
+
+        background: transparent !important;
+
+        font-weight: 800 !important;
+    }
+
+    [data-testid="stMetricValue"] * {
+
+        color: #111111 !important;
+
+        background: transparent !important;
+    }
+
+    [data-testid="stMetricValue"] div {
+
+        color: #111111 !important;
+
+        background: transparent !important;
     }
 
 
-    /* ======================================================
-       DATAFRAME
-       ====================================================== */
+    /* ========================================================
+       BUTTONS
+       ======================================================== */
 
-    [data-testid="stDataFrame"] {
-        border: 1px solid #e5e5e5;
-        border-radius: 10px;
-        overflow: hidden;
+    .stButton > button {
+
+        background: #ff7900 !important;
+
+        color: #ffffff !important;
+
+        border: 1px solid #ff7900 !important;
+
+        border-radius: 8px !important;
+
+        font-weight: 700 !important;
+
+        min-height: 42px !important;
+    }
+
+    .stButton > button:hover {
+
+        background: #e96800 !important;
+
+        border-color: #e96800 !important;
+
+        color: #ffffff !important;
     }
 
 
-    /* ======================================================
+    /* ========================================================
+       DOWNLOAD BUTTON
+       ======================================================== */
+
+    .stDownloadButton > button {
+
+        background: #ff7900 !important;
+
+        color: #ffffff !important;
+
+        border: 1px solid #ff7900 !important;
+
+        border-radius: 8px !important;
+
+        font-weight: 700 !important;
+    }
+
+    .stDownloadButton > button:hover {
+
+        background: #e96800 !important;
+
+        color: #ffffff !important;
+    }
+
+
+    /* ========================================================
        FILE UPLOADER
-       ====================================================== */
+       ======================================================== */
 
     [data-testid="stFileUploader"] {
-        background-color: #ffffff;
-        border-radius: 10px;
+
+        background: #ffffff !important;
+
+        border-radius: 10px !important;
     }
 
 
-    /* ======================================================
-       INPUTS
-       ====================================================== */
+    /* ========================================================
+       SELECTBOX / INPUT
+       ======================================================== */
 
     div[data-baseweb="select"] > div {
-        border-radius: 8px;
+
+        border-radius: 8px !important;
+
+        background: #ffffff !important;
     }
 
     input {
+
         border-radius: 8px !important;
     }
 
 
-    /* ======================================================
-       DIVIDERS
-       ====================================================== */
+    /* ========================================================
+       DATAFRAME
+       ======================================================== */
+
+    [data-testid="stDataFrame"] {
+
+        border: 1px solid #e5e5e5 !important;
+
+        border-radius: 10px !important;
+
+        overflow: hidden !important;
+    }
+
+
+    /* ========================================================
+       DIVIDER
+       ======================================================== */
 
     hr {
+
         border-color: #eeeeee !important;
     }
 
 
-    /* ======================================================
-       ALERTS
-       ====================================================== */
+    /* ========================================================
+       INFO / WARNING / SUCCESS / ERROR
+       ======================================================== */
 
     [data-testid="stAlert"] {
-        border-radius: 10px;
+
+        border-radius: 10px !important;
+    }
+
+
+    /* ========================================================
+       ORANGE ACCENT
+       ======================================================== */
+
+    .orange-text {
+
+        color: #ff7900 !important;
     }
 
     </style>
@@ -230,25 +440,35 @@ st.markdown(
 
 
 # ============================================================
-# UTILITY FUNCTIONS
+# HELPER FUNCTIONS
 # ============================================================
 
 def money(value):
+
     try:
         return f"₹{float(value):,.2f}"
+
     except Exception:
         return "₹0.00"
 
 
 def pct(value):
+
     try:
         return f"{float(value) * 100:.2f}%"
+
     except Exception:
         return "0.00%"
 
 
-def safe_numeric(df, column, default=0):
+def safe_numeric(
+    df,
+    column,
+    default=0
+):
+
     if column not in df.columns:
+
         df[column] = default
 
     df[column] = pd.to_numeric(
@@ -260,35 +480,34 @@ def safe_numeric(df, column, default=0):
 
 
 def risk_label(score):
+
     if score >= 75:
         return "CRITICAL"
+
     elif score >= 60:
         return "HIGH"
+
     elif score >= 30:
         return "MODERATE"
+
     return "LOW"
 
 
-def action_icon(action):
-    if action == "REVIEW":
-        return "🔴 REVIEW"
-    elif action == "VERIFY":
-        return "🟠 VERIFY"
-    return "🟢 APPROVE"
-
-
 # ============================================================
-# MODEL LOADING
+# LOAD MODEL
 # ============================================================
 
 @st.cache_resource
 def load_model():
 
-    bundle = joblib.load(MODEL_PATH)
+    bundle = joblib.load(
+        MODEL_PATH
+    )
 
     if isinstance(bundle, dict):
 
         if "model" not in bundle:
+
             raise ValueError(
                 "The joblib file does not contain a trained model."
             )
@@ -304,63 +523,89 @@ def load_model():
 
     model = bundle
 
-    if hasattr(model, "feature_names_in_"):
+    if hasattr(
+        model,
+        "feature_names_in_"
+    ):
+
         features = list(
             model.feature_names_in_
         )
+
     else:
+
         features = MODEL_FEATURES
 
     return model, features
 
 
 # ============================================================
-# DEFAULT DATA
+# LOAD DEFAULT CSV
 # ============================================================
 
 @st.cache_data
 def load_default_data():
+
     return pd.read_csv(
         DEFAULT_DATA_PATH
     )
 
 
 # ============================================================
-# INPUT VALIDATION
+# VALIDATE CSV
 # ============================================================
 
 def validate_input(df):
 
-    required = [
+    required_columns = [
+
         "transaction_id",
+
         "customer_id",
+
         "merchant_id",
+
         "device_id",
+
         "ip_id",
+
         "timestamp",
+
         "amount",
+
         "location",
+
         "account_age_days",
+
         "device_age_days",
+
         "transactions_last_10min",
+
         "failed_attempts",
+
         "location_change",
+
         "amount_deviation",
     ]
 
     missing = [
-        col
-        for col in required
-        if col not in df.columns
+
+        column
+
+        for column in required_columns
+
+        if column not in df.columns
     ]
 
     if missing:
+
         raise ValueError(
             "Missing required CSV columns: "
             + ", ".join(missing)
         )
 
     if df.empty:
+
         raise ValueError(
             "The uploaded CSV contains no transactions."
         )
@@ -370,14 +615,16 @@ def validate_input(df):
 # FEATURE ENGINEERING
 # ============================================================
 
-def engineer_features(raw):
+def engineer_features(
+    raw_data
+):
 
-    df = raw.copy()
+    df = raw_data.copy()
 
     validate_input(df)
 
     # --------------------------------------------------------
-    # Timestamp
+    # TIMESTAMP
     # --------------------------------------------------------
 
     df["timestamp"] = pd.to_datetime(
@@ -386,25 +633,34 @@ def engineer_features(raw):
     )
 
     if df["timestamp"].isna().any():
+
         raise ValueError(
             "One or more timestamp values could not be parsed."
         )
 
     # --------------------------------------------------------
-    # Numeric fields
+    # NUMERIC FEATURES
     # --------------------------------------------------------
 
-    numeric_fields = [
+    numeric_columns = [
+
         "amount",
+
         "account_age_days",
+
         "device_age_days",
+
         "transactions_last_10min",
+
         "failed_attempts",
+
         "location_change",
+
         "amount_deviation",
     ]
 
-    for column in numeric_fields:
+    for column in numeric_columns:
+
         df = safe_numeric(
             df,
             column,
@@ -412,7 +668,7 @@ def engineer_features(raw):
         )
 
     # --------------------------------------------------------
-    # Time features
+    # TIME FEATURES
     # --------------------------------------------------------
 
     df["hour"] = (
@@ -428,15 +684,17 @@ def engineer_features(raw):
     ).astype(int)
 
     # --------------------------------------------------------
-    # Amount features
+    # AMOUNT FEATURES
     # --------------------------------------------------------
 
     df["log_amount"] = np.log1p(
-        df["amount"].clip(lower=0)
+        df["amount"].clip(
+            lower=0
+        )
     )
 
     # --------------------------------------------------------
-    # REQUIRED MODEL FEATURE
+    # IMPORTANT MODEL FEATURE
     # --------------------------------------------------------
 
     df["high_value_transaction"] = (
@@ -444,7 +702,7 @@ def engineer_features(raw):
     ).astype(int)
 
     # --------------------------------------------------------
-    # Behaviour features
+    # BEHAVIOUR FEATURES
     # --------------------------------------------------------
 
     df["high_velocity"] = (
@@ -464,34 +722,54 @@ def engineer_features(raw):
     ).astype(int)
 
     # --------------------------------------------------------
-    # Behaviour risk count
+    # BEHAVIOUR RISK COUNT
     # --------------------------------------------------------
 
     df["behavior_risk_count"] = (
+
         df["high_velocity"]
-        + df["high_failure_activity"]
-        + df["new_device"]
-        + df["new_account"]
-        + df["location_change"]
-        + (
+
+        +
+
+        df["high_failure_activity"]
+
+        +
+
+        df["new_device"]
+
+        +
+
+        df["new_account"]
+
+        +
+
+        df["location_change"]
+
+        +
+
+        (
             df["amount_deviation"] > 3
         ).astype(int)
     )
 
     # --------------------------------------------------------
-    # FINAL FEATURE CHECK
+    # FINAL FEATURE VALIDATION
     # --------------------------------------------------------
 
-    missing = [
+    missing_features = [
+
         feature
+
         for feature in MODEL_FEATURES
+
         if feature not in df.columns
     ]
 
-    if missing:
+    if missing_features:
+
         raise ValueError(
             "Model features missing after feature engineering: "
-            + ", ".join(missing)
+            + ", ".join(missing_features)
         )
 
     return df
@@ -501,7 +779,9 @@ def engineer_features(raw):
 # ANOMALY DETECTION
 # ============================================================
 
-def calculate_anomaly_scores(df):
+def calculate_anomaly_scores(
+    df
+):
 
     work = (
         df
@@ -521,7 +801,10 @@ def calculate_anomaly_scores(df):
         int(len(work) * 0.80)
     )
 
-    historical = work.iloc[:split].copy()
+    historical = (
+        work.iloc[:split]
+        .copy()
+    )
 
     if (
         "is_fraud" in historical.columns
@@ -537,10 +820,13 @@ def calculate_anomaly_scores(df):
         legitimate = historical.copy()
 
     if len(legitimate) < 20:
+
         legitimate = historical.copy()
 
     X_train = (
-        legitimate[ANOMALY_FEATURES]
+        legitimate[
+            ANOMALY_FEATURES
+        ]
         .replace(
             [np.inf, -np.inf],
             np.nan
@@ -549,7 +835,9 @@ def calculate_anomaly_scores(df):
     )
 
     X_all = (
-        work[ANOMALY_FEATURES]
+        work[
+            ANOMALY_FEATURES
+        ]
         .replace(
             [np.inf, -np.inf],
             np.nan
@@ -558,13 +846,15 @@ def calculate_anomaly_scores(df):
     )
 
     iso = IsolationForest(
-        n_estimators=300,
+        n_estimators=250,
         random_state=42,
         contamination="auto",
         n_jobs=-1
     )
 
-    iso.fit(X_train)
+    iso.fit(
+        X_train
+    )
 
     train_scores = (
         -iso.decision_function(
@@ -608,10 +898,12 @@ def calculate_anomaly_scores(df):
 
 
 # ============================================================
-# ENTITY / GRAPH SIGNALS
+# ENTITY / GRAPH FEATURES
 # ============================================================
 
-def calculate_graph_features(df):
+def calculate_graph_features(
+    df
+):
 
     work = (
         df
@@ -625,7 +917,10 @@ def calculate_graph_features(df):
         int(len(work) * 0.80)
     )
 
-    historical = work.iloc[:split].copy()
+    historical = (
+        work.iloc[:split]
+        .copy()
+    )
 
     device_customer_count = (
         historical
@@ -653,25 +948,33 @@ def calculate_graph_features(df):
 
     work["device_customer_count"] = (
         work["device_id"]
-        .map(device_customer_count)
+        .map(
+            device_customer_count
+        )
         .fillna(0)
     )
 
     work["ip_customer_count"] = (
         work["ip_id"]
-        .map(ip_customer_count)
+        .map(
+            ip_customer_count
+        )
         .fillna(0)
     )
 
     work["device_transaction_count"] = (
         work["device_id"]
-        .map(device_transaction_count)
+        .map(
+            device_transaction_count
+        )
         .fillna(0)
     )
 
     work["ip_transaction_count"] = (
         work["ip_id"]
-        .map(ip_transaction_count)
+        .map(
+            ip_transaction_count
+        )
         .fillna(0)
     )
 
@@ -731,7 +1034,9 @@ def calculate_graph_features(df):
 # RISK EXPLANATION
 # ============================================================
 
-def get_reasons(row):
+def get_reasons(
+    row
+):
 
     reasons = []
 
@@ -820,19 +1125,23 @@ def get_reasons(row):
 
 
 # ============================================================
-# COMPLETE RISK PIPELINE
+# MAIN PIPELINE
 # ============================================================
 
-def run_pipeline(raw_data):
+def run_pipeline(
+    raw_data
+):
 
     df = engineer_features(
         raw_data
     )
 
-    model, model_features = load_model()
+    model, model_features = (
+        load_model()
+    )
 
     # --------------------------------------------------------
-    # Guarantee all model features
+    # MODEL FEATURE CHECK
     # --------------------------------------------------------
 
     for feature in model_features:
@@ -844,7 +1153,9 @@ def run_pipeline(raw_data):
             )
 
     X = (
-        df[model_features]
+        df[
+            model_features
+        ]
         .replace(
             [np.inf, -np.inf],
             np.nan
@@ -853,7 +1164,7 @@ def run_pipeline(raw_data):
     )
 
     # --------------------------------------------------------
-    # Fraud probability
+    # FRAUD PROBABILITY
     # --------------------------------------------------------
 
     if not hasattr(
@@ -888,7 +1199,7 @@ def run_pipeline(raw_data):
     )
 
     # --------------------------------------------------------
-    # Anomaly score
+    # ANOMALY
     # --------------------------------------------------------
 
     df = calculate_anomaly_scores(
@@ -896,7 +1207,7 @@ def run_pipeline(raw_data):
     )
 
     # --------------------------------------------------------
-    # Graph score
+    # GRAPH
     # --------------------------------------------------------
 
     df = calculate_graph_features(
@@ -904,11 +1215,12 @@ def run_pipeline(raw_data):
     )
 
     # --------------------------------------------------------
-    # Signal components
+    # FRAUD SIGNAL
     # --------------------------------------------------------
 
     df["fraud_signal"] = (
-        df["fraud_probability"] * 100
+        df["fraud_probability"]
+        * 100
     )
 
     df["anomaly_signal"] = (
@@ -916,7 +1228,7 @@ def run_pipeline(raw_data):
     )
 
     # --------------------------------------------------------
-    # Financial exposure
+    # FINANCIAL EXPOSURE
     # --------------------------------------------------------
 
     df["expected_fraud_loss"] = (
@@ -931,12 +1243,16 @@ def run_pipeline(raw_data):
     )
 
     if (
-        not np.isfinite(exposure_reference)
+        not np.isfinite(
+            exposure_reference
+        )
         or exposure_reference <= 0
     ):
+
         exposure_reference = 1
 
     df["financial_exposure_score"] = np.clip(
+
         (
             df["expected_fraud_loss"]
             /
@@ -944,6 +1260,7 @@ def run_pipeline(raw_data):
             *
             100
         ),
+
         0,
         100
     )
@@ -953,19 +1270,25 @@ def run_pipeline(raw_data):
     # --------------------------------------------------------
 
     df["risk_score"] = np.clip(
+
         (
             0.50 * df["fraud_signal"]
+
             +
+
             0.30 * df["anomaly_signal"]
+
             +
+
             0.20 * df["financial_exposure_score"]
         ),
+
         0,
         100
     )
 
     # --------------------------------------------------------
-    # COST-AWARE RECOMMENDED ACTION
+    # COST-AWARE ACTION
     # --------------------------------------------------------
 
     df["approve_cost"] = (
@@ -973,8 +1296,11 @@ def run_pipeline(raw_data):
     )
 
     df["verify_cost"] = (
+
         VERIFY_COST
+
         +
+
         (
             df["expected_fraud_loss"]
             *
@@ -983,8 +1309,11 @@ def run_pipeline(raw_data):
     )
 
     df["review_cost"] = (
+
         REVIEW_COST
+
         +
+
         (
             df["expected_fraud_loss"]
             *
@@ -999,7 +1328,9 @@ def run_pipeline(raw_data):
     ]
 
     df["recommended_action"] = (
-        df[cost_columns]
+        df[
+            cost_columns
+        ]
         .idxmin(axis=1)
         .map(
             {
@@ -1011,22 +1342,28 @@ def run_pipeline(raw_data):
     )
 
     # --------------------------------------------------------
-    # FINAL DECISION POLICY
+    # FINAL POLICY
     # --------------------------------------------------------
 
-    def choose_action(score):
+    def choose_action(
+        score
+    ):
 
         if score < VERIFY_THRESHOLD:
+
             return "APPROVE"
 
         if score < REVIEW_THRESHOLD:
+
             return "VERIFY"
 
         return "REVIEW"
 
     df["final_action"] = (
         df["risk_score"]
-        .apply(choose_action)
+        .apply(
+            choose_action
+        )
     )
 
     # --------------------------------------------------------
@@ -1035,7 +1372,9 @@ def run_pipeline(raw_data):
 
     df["risk_band"] = (
         df["risk_score"]
-        .apply(risk_label)
+        .apply(
+            risk_label
+        )
     )
 
     # --------------------------------------------------------
@@ -1044,33 +1383,45 @@ def run_pipeline(raw_data):
 
     df["signal_count"] = (
 
-        (df["fraud_probability"] >= 0.50)
-        .astype(int)
+        (
+            df["fraud_probability"]
+            >= 0.50
+        ).astype(int)
 
         +
 
-        (df["anomaly_score"] >= 75)
-        .astype(int)
+        (
+            df["anomaly_score"]
+            >= 75
+        ).astype(int)
 
         +
 
-        (df["financial_exposure_score"] >= 75)
-        .astype(int)
+        (
+            df["financial_exposure_score"]
+            >= 75
+        ).astype(int)
 
         +
 
-        (df["shared_device"] == 1)
-        .astype(int)
+        (
+            df["shared_device"]
+            == 1
+        ).astype(int)
 
         +
 
-        (df["shared_ip"] == 1)
-        .astype(int)
+        (
+            df["shared_ip"]
+            == 1
+        ).astype(int)
 
         +
 
-        (df["behavior_risk_count"] >= 3)
-        .astype(int)
+        (
+            df["behavior_risk_count"]
+            >= 3
+        ).astype(int)
     )
 
     return df
@@ -1080,7 +1431,9 @@ def run_pipeline(raw_data):
 # SIDEBAR BRAND
 # ============================================================
 
-st.sidebar.title("🛡️ RiskGraph AI")
+st.sidebar.title(
+    "🛡️ RiskGraph AI"
+)
 
 st.sidebar.caption(
     "AI Payment Risk Manager"
@@ -1093,12 +1446,17 @@ st.sidebar.divider()
 # DATA UPLOAD
 # ============================================================
 
-st.sidebar.subheader("DATA")
+st.sidebar.subheader(
+    "DATA"
+)
 
 uploaded_file = st.sidebar.file_uploader(
     "Upload transaction CSV",
     type=["csv"],
-    help="Upload a CSV with the same schema as sample_transactions.csv."
+    help=(
+        "Upload a transaction CSV using "
+        "sample_transactions.csv as the schema reference."
+    )
 )
 
 
@@ -1110,7 +1468,9 @@ if uploaded_file is not None:
             uploaded_file
         )
 
-        source_name = uploaded_file.name
+        source_name = (
+            uploaded_file.name
+        )
 
     except Exception as error:
 
@@ -1126,12 +1486,15 @@ else:
 
         raw_data = load_default_data()
 
-        source_name = DEFAULT_DATA_PATH
+        source_name = (
+            DEFAULT_DATA_PATH
+        )
 
     except Exception as error:
 
         st.sidebar.error(
-            "Default sample_transactions.csv could not be loaded."
+            "sample_transactions.csv "
+            "could not be loaded."
         )
 
         st.sidebar.code(
@@ -1142,7 +1505,7 @@ else:
 
 
 # ============================================================
-# RUN PIPELINE
+# RUN RISK ENGINE
 # ============================================================
 
 try:
@@ -1162,7 +1525,8 @@ except Exception as error:
     )
 
     st.info(
-        "Use sample_transactions.csv as the reference CSV format."
+        "Use sample_transactions.csv "
+        "as the reference CSV format."
     )
 
     st.stop()
@@ -1177,7 +1541,7 @@ st.sidebar.success(
 )
 
 st.sidebar.caption(
-    f"Source: {source_name}"
+    f"Uploaded: {source_name}"
 )
 
 st.sidebar.metric(
@@ -1187,24 +1551,26 @@ st.sidebar.metric(
 
 st.sidebar.metric(
     "Interventions",
-    f"{(data['final_action'] != 'APPROVE').sum():,}"
+    f"{int((data['final_action'] != 'APPROVE').sum()):,}"
 )
 
 st.sidebar.divider()
 
 st.sidebar.success(
-    "Risk Engine Online"
+    "🟠 Risk Engine Online"
 )
 
 
 # ============================================================
-# NAVIGATION
+# SIDEBAR NAVIGATION
 # ============================================================
 
-st.sidebar.subheader("RISK OPERATIONS")
+st.sidebar.subheader(
+    "RISK OPERATIONS"
+)
 
 page = st.sidebar.radio(
-    "Go to",
+    "Navigate",
     [
         "Command Center",
         "Investigate",
@@ -1222,7 +1588,9 @@ page = st.sidebar.radio(
 
 if page == "Command Center":
 
-    st.title("RiskGraph AI")
+    st.title(
+        "RiskGraph AI"
+    )
 
     st.subheader(
         "Payment Risk Command Center"
@@ -1234,35 +1602,35 @@ if page == "Command Center":
 
     st.divider()
 
-    # --------------------------------------------------------
-    # KPI
-    # --------------------------------------------------------
-
-    total_transactions = len(data)
+    total_transactions = (
+        len(data)
+    )
 
     total_value = (
         data["amount"].sum()
     )
 
     approved = (
-        data["final_action"] == "APPROVE"
+        data["final_action"]
+        ==
+        "APPROVE"
     ).sum()
 
     verify = (
-        data["final_action"] == "VERIFY"
+        data["final_action"]
+        ==
+        "VERIFY"
     ).sum()
 
     review = (
-        data["final_action"] == "REVIEW"
+        data["final_action"]
+        ==
+        "REVIEW"
     ).sum()
 
-    fraud_cases = (
-        data["is_fraud"].sum()
-        if "is_fraud" in data.columns
-        else None
+    c1, c2, c3, c4, c5 = (
+        st.columns(5)
     )
-
-    c1, c2, c3, c4, c5 = st.columns(5)
 
     c1.metric(
         "Transactions",
@@ -1292,12 +1660,14 @@ if page == "Command Center":
     st.divider()
 
     # --------------------------------------------------------
-    # RISK DISTRIBUTION
+    # CHARTS
     # --------------------------------------------------------
 
-    left, right = st.columns(2)
+    chart_left, chart_right = (
+        st.columns(2)
+    )
 
-    with left:
+    with chart_left:
 
         st.subheader(
             "Risk Score Distribution"
@@ -1327,7 +1697,7 @@ if page == "Command Center":
             "HIGH 60–74.99 • CRITICAL ≥ 75"
         )
 
-    with right:
+    with chart_right:
 
         st.subheader(
             "Decision Mix"
@@ -1374,7 +1744,7 @@ if page == "Command Center":
     )
 
     st.caption(
-        "Highest-risk transactions requiring attention."
+        "Highest-risk transactions requiring analyst attention."
     )
 
     queue = (
@@ -1406,27 +1776,39 @@ if page == "Command Center":
     )
 
     queue_display["fraud_probability"] = (
-        queue_display["fraud_probability"]
+        queue_display[
+            "fraud_probability"
+        ]
         .map(pct)
     )
 
     queue_display["anomaly_score"] = (
-        queue_display["anomaly_score"]
+        queue_display[
+            "anomaly_score"
+        ]
         .round(1)
     )
 
     queue_display["graph_risk_score"] = (
-        queue_display["graph_risk_score"]
+        queue_display[
+            "graph_risk_score"
+        ]
         .round(1)
     )
 
-    queue_display["financial_exposure_score"] = (
-        queue_display["financial_exposure_score"]
+    queue_display[
+        "financial_exposure_score"
+    ] = (
+        queue_display[
+            "financial_exposure_score"
+        ]
         .round(1)
     )
 
     queue_display["risk_score"] = (
-        queue_display["risk_score"]
+        queue_display[
+            "risk_score"
+        ]
         .round(1)
     )
 
@@ -1437,9 +1819,9 @@ if page == "Command Center":
     )
 
     st.info(
-        "RiskGraph combines fraud probability, behavioural anomaly, "
-        "entity intelligence and financial exposure into a final "
-        "0–100 risk score."
+        "RiskGraph combines fraud probability, "
+        "behavioural anomaly, entity intelligence "
+        "and financial exposure into a final 0–100 risk score."
     )
 
 
@@ -1500,39 +1882,58 @@ elif page == "Investigate":
         q = search.strip().lower()
 
         mask = (
-            filtered["transaction_id"]
+
+            filtered[
+                "transaction_id"
+            ]
             .astype(str)
             .str.lower()
             .str.contains(
                 q,
                 na=False
             )
+
             |
-            filtered["customer_id"]
+
+            filtered[
+                "customer_id"
+            ]
             .astype(str)
             .str.lower()
             .str.contains(
                 q,
                 na=False
             )
+
             |
-            filtered["merchant_id"]
+
+            filtered[
+                "merchant_id"
+            ]
             .astype(str)
             .str.lower()
             .str.contains(
                 q,
                 na=False
             )
+
             |
-            filtered["device_id"]
+
+            filtered[
+                "device_id"
+            ]
             .astype(str)
             .str.lower()
             .str.contains(
                 q,
                 na=False
             )
+
             |
-            filtered["ip_id"]
+
+            filtered[
+                "ip_id"
+            ]
             .astype(str)
             .str.lower()
             .str.contains(
@@ -1578,22 +1979,30 @@ elif page == "Investigate":
         )
 
         display["fraud_probability"] = (
-            display["fraud_probability"]
+            display[
+                "fraud_probability"
+            ]
             .map(pct)
         )
 
         display["anomaly_score"] = (
-            display["anomaly_score"]
+            display[
+                "anomaly_score"
+            ]
             .round(1)
         )
 
         display["graph_risk_score"] = (
-            display["graph_risk_score"]
+            display[
+                "graph_risk_score"
+            ]
             .round(1)
         )
 
         display["risk_score"] = (
-            display["risk_score"]
+            display[
+                "risk_score"
+            ]
             .round(1)
         )
 
@@ -1605,15 +2014,19 @@ elif page == "Investigate":
 
         st.divider()
 
-        selected_transaction = st.selectbox(
-            "Select transaction to investigate",
-            filtered[
-                "transaction_id"
-            ].tolist()
+        selected_transaction = (
+            st.selectbox(
+                "Select transaction to investigate",
+                filtered[
+                    "transaction_id"
+                ].tolist()
+            )
         )
 
         row = filtered[
-            filtered["transaction_id"]
+            filtered[
+                "transaction_id"
+            ]
             ==
             selected_transaction
         ].iloc[0]
@@ -1622,7 +2035,9 @@ elif page == "Investigate":
             f"Investigation: {selected_transaction}"
         )
 
-        a, b, c, d = st.columns(4)
+        a, b, c, d = (
+            st.columns(4)
+        )
 
         a.metric(
             "Risk Score",
@@ -1631,7 +2046,11 @@ elif page == "Investigate":
 
         b.metric(
             "Fraud Probability",
-            pct(row["fraud_probability"])
+            pct(
+                row[
+                    "fraud_probability"
+                ]
+            )
         )
 
         c.metric(
@@ -1640,11 +2059,15 @@ elif page == "Investigate":
         )
 
         d.metric(
-            "Amount",
-            money(row["amount"])
+            "Transaction Amount",
+            money(
+                row["amount"]
+            )
         )
 
-        action = row["final_action"]
+        action = row[
+            "final_action"
+        ]
 
         if action == "REVIEW":
 
@@ -1665,7 +2088,7 @@ elif page == "Investigate":
             )
 
         st.subheader(
-            "Why?"
+            "Risk Explanation"
         )
 
         reasons = get_reasons(
@@ -1682,33 +2105,43 @@ elif page == "Investigate":
             "Entity Context"
         )
 
-        e1, e2, e3, e4 = st.columns(4)
+        e1, e2, e3, e4 = (
+            st.columns(4)
+        )
 
         e1.metric(
             "Customers / Device",
             int(
-                row["device_customer_count"]
+                row[
+                    "device_customer_count"
+                ]
             )
         )
 
         e2.metric(
             "Customers / IP",
             int(
-                row["ip_customer_count"]
+                row[
+                    "ip_customer_count"
+                ]
             )
         )
 
         e3.metric(
             "Device Transactions",
             int(
-                row["device_transaction_count"]
+                row[
+                    "device_transaction_count"
+                ]
             )
         )
 
         e4.metric(
             "IP Transactions",
             int(
-                row["ip_transaction_count"]
+                row[
+                    "ip_transaction_count"
+                ]
             )
         )
 
@@ -1719,44 +2152,110 @@ elif page == "Investigate":
         details = pd.DataFrame(
             {
                 "Field": [
+
                     "Customer",
+
                     "Merchant",
+
                     "Device",
+
                     "IP",
+
                     "Timestamp",
+
                     "Location",
+
                     "Account Age",
+
                     "Device Age",
+
                     "Transactions / 10 min",
+
                     "Failed Attempts",
+
                     "Location Change",
+
                     "Amount Deviation",
+
                     "Behaviour Risk Count",
+
                     "Expected Fraud Loss",
+
                     "Financial Exposure",
-                    "Graph Risk Score"
+
+                    "Graph Risk Score",
                 ],
+
                 "Value": [
-                    row["customer_id"],
-                    row["merchant_id"],
-                    row["device_id"],
-                    row["ip_id"],
-                    str(row["timestamp"]),
-                    row["location"],
-                    f"{int(row['account_age_days'])} days",
-                    f"{int(row['device_age_days'])} days",
-                    int(row["transactions_last_10min"]),
-                    int(row["failed_attempts"]),
-                    "Yes"
-                    if row["location_change"]
-                    else "No",
-                    f"{row['amount_deviation']:.2f}×",
-                    int(row["behavior_risk_count"]),
-                    money(
-                        row["expected_fraud_loss"]
+
+                    row[
+                        "customer_id"
+                    ],
+
+                    row[
+                        "merchant_id"
+                    ],
+
+                    row[
+                        "device_id"
+                    ],
+
+                    row[
+                        "ip_id"
+                    ],
+
+                    str(
+                        row[
+                            "timestamp"
+                        ]
                     ),
+
+                    row[
+                        "location"
+                    ],
+
+                    f"{int(row['account_age_days'])} days",
+
+                    f"{int(row['device_age_days'])} days",
+
+                    int(
+                        row[
+                            "transactions_last_10min"
+                        ]
+                    ),
+
+                    int(
+                        row[
+                            "failed_attempts"
+                        ]
+                    ),
+
+                    (
+                        "Yes"
+                        if row[
+                            "location_change"
+                        ]
+                        else
+                        "No"
+                    ),
+
+                    f"{row['amount_deviation']:.2f}×",
+
+                    int(
+                        row[
+                            "behavior_risk_count"
+                        ]
+                    ),
+
+                    money(
+                        row[
+                            "expected_fraud_loss"
+                        ]
+                    ),
+
                     f"{row['financial_exposure_score']:.1f}/100",
-                    f"{row['graph_risk_score']:.1f}/100"
+
+                    f"{row['graph_risk_score']:.1f}/100",
                 ]
             }
         )
@@ -1785,27 +2284,39 @@ elif page == "Model Intelligence":
     st.divider()
 
     st.subheader(
-        "Model Architecture"
+        "RiskGraph Architecture"
     )
 
     architecture = pd.DataFrame(
         {
             "Layer": [
+
                 "Fraud Detection",
+
                 "Behavioural Detection",
+
                 "Entity Intelligence",
+
                 "Financial Exposure",
+
                 "Risk Fusion",
-                "Decision Policy"
+
+                "Decision Policy",
             ],
 
             "Purpose": [
+
                 "Predict fraud probability",
+
                 "Detect unusual behaviour",
+
                 "Detect device and IP relationships",
+
                 "Estimate monetary exposure",
-                "Combine risk signals",
-                "Convert risk into action"
+
+                "Combine multiple risk signals",
+
+                "Convert risk into action",
             ]
         }
     )
@@ -1821,28 +2332,46 @@ elif page == "Model Intelligence":
     )
 
     feature_descriptions = [
+
         "Transaction amount",
-        "Log transformed amount",
+
+        "Log transformed transaction amount",
+
         "Customer account age",
+
         "Device age",
-        "Transactions in last 10 minutes",
+
+        "Transactions during the last 10 minutes",
+
         "Failed attempts",
-        "Location change",
+
+        "Location change indicator",
+
         "Amount deviation",
+
         "Behaviour risk count",
+
         "Transaction hour",
+
         "Day of week",
+
         "Weekend indicator",
-        "High value transaction",
+
+        "High-value transaction indicator",
+
         "High transaction velocity",
+
         "High failure activity",
-        "New device",
-        "New account"
+
+        "New device indicator",
+
+        "New account indicator",
     ]
 
     feature_table = pd.DataFrame(
         {
             "Feature": MODEL_FEATURES,
+
             "Purpose": feature_descriptions
         }
     )
@@ -1857,7 +2386,9 @@ elif page == "Model Intelligence":
         "Current Dataset Statistics"
     )
 
-    m1, m2, m3, m4 = st.columns(4)
+    m1, m2, m3, m4 = (
+        st.columns(4)
+    )
 
     m1.metric(
         "Transactions",
@@ -1872,7 +2403,9 @@ elif page == "Model Intelligence":
     m3.metric(
         "Average Fraud Probability",
         pct(
-            data["fraud_probability"].mean()
+            data[
+                "fraud_probability"
+            ].mean()
         )
     )
 
@@ -1891,8 +2424,9 @@ elif page == "Model Intelligence":
         )
 
     st.info(
-        "Historical notebook evaluation metrics belong to Razorpay.ipynb. "
-        "The deployed app uses the trained joblib model to score uploaded transactions."
+        "Razorpay.ipynb contains the model-development and evaluation work. "
+        "The deployed Streamlit application loads the trained "
+        "riskgraph_fraud_model_v2.joblib model."
     )
 
 
@@ -1913,36 +2447,48 @@ elif page == "Business Impact":
     st.divider()
 
     baseline_loss = (
-        data["expected_fraud_loss"]
-        .sum()
+        data[
+            "expected_fraud_loss"
+        ].sum()
     )
 
     approve_loss = (
         data.loc[
-            data["final_action"] == "APPROVE",
+            data["final_action"]
+            ==
+            "APPROVE",
             "expected_fraud_loss"
-        ]
-        .sum()
+        ].sum()
     )
 
     verify_loss = (
         data.loc[
-            data["final_action"] == "VERIFY",
+            data["final_action"]
+            ==
+            "VERIFY",
             "expected_fraud_loss"
-        ]
-        .sum()
+        ].sum()
         *
-        (1 - VERIFY_FRAUD_REDUCTION)
+        (
+            1
+            -
+            VERIFY_FRAUD_REDUCTION
+        )
     )
 
     review_loss = (
         data.loc[
-            data["final_action"] == "REVIEW",
+            data["final_action"]
+            ==
+            "REVIEW",
             "expected_fraud_loss"
-        ]
-        .sum()
+        ].sum()
         *
-        (1 - REVIEW_FRAUD_REDUCTION)
+        (
+            1
+            -
+            REVIEW_FRAUD_REDUCTION
+        )
     )
 
     residual_loss = (
@@ -1956,7 +2502,8 @@ elif page == "Business Impact":
     verification_cost = (
         (
             data["final_action"]
-            == "VERIFY"
+            ==
+            "VERIFY"
         ).sum()
         *
         VERIFY_COST
@@ -1965,7 +2512,8 @@ elif page == "Business Impact":
     review_cost = (
         (
             data["final_action"]
-            == "REVIEW"
+            ==
+            "REVIEW"
         ).sum()
         *
         REVIEW_COST
@@ -1983,26 +2531,36 @@ elif page == "Business Impact":
         intervention_cost
     )
 
-    b1, b2, b3, b4 = st.columns(4)
+    b1, b2, b3, b4 = (
+        st.columns(4)
+    )
 
     b1.metric(
         "Baseline Expected Loss",
-        money(baseline_loss)
+        money(
+            baseline_loss
+        )
     )
 
     b2.metric(
         "Residual Loss",
-        money(residual_loss)
+        money(
+            residual_loss
+        )
     )
 
     b3.metric(
         "Intervention Cost",
-        money(intervention_cost)
+        money(
+            intervention_cost
+        )
     )
 
     b4.metric(
         "Total Decision Cost",
-        money(total_cost)
+        money(
+            total_cost
+        )
     )
 
     st.divider()
@@ -2013,16 +2571,20 @@ elif page == "Business Impact":
 
     economics = (
         data
-        .groupby("final_action")
+        .groupby(
+            "final_action"
+        )
         .agg(
             transactions=(
                 "transaction_id",
                 "count"
             ),
+
             transaction_value=(
                 "amount",
                 "sum"
             ),
+
             expected_loss=(
                 "expected_fraud_loss",
                 "sum"
@@ -2031,13 +2593,21 @@ elif page == "Business Impact":
         .reset_index()
     )
 
-    economics["transaction_value"] = (
-        economics["transaction_value"]
+    economics[
+        "transaction_value"
+    ] = (
+        economics[
+            "transaction_value"
+        ]
         .map(money)
     )
 
-    economics["expected_loss"] = (
-        economics["expected_loss"]
+    economics[
+        "expected_loss"
+    ] = (
+        economics[
+            "expected_loss"
+        ]
         .map(money)
     )
 
@@ -2048,8 +2618,9 @@ elif page == "Business Impact":
     )
 
     st.warning(
-        "VERIFY and REVIEW costs are prototype assumptions used for "
-        "cost-aware decisioning. They are not claimed to be actual Razorpay costs."
+        "VERIFY and REVIEW costs are prototype assumptions "
+        "for cost-aware decisioning and are not claimed to "
+        "represent actual Razorpay operating costs."
     )
 
 
@@ -2082,16 +2653,20 @@ elif page == "Entity Network":
 
         entity_summary = (
             data
-            .groupby("device_id")
+            .groupby(
+                "device_id"
+            )
             .agg(
                 customers=(
                     "customer_id",
                     "nunique"
                 ),
+
                 transactions=(
                     "transaction_id",
                     "count"
                 ),
+
                 average_risk=(
                     "risk_score",
                     "mean"
@@ -2108,22 +2683,28 @@ elif page == "Entity Network":
             .head(30)
         )
 
-        entity_column = "device_id"
+        entity_column = (
+            "device_id"
+        )
 
     elif entity_type == "IP Address":
 
         entity_summary = (
             data
-            .groupby("ip_id")
+            .groupby(
+                "ip_id"
+            )
             .agg(
                 customers=(
                     "customer_id",
                     "nunique"
                 ),
+
                 transactions=(
                     "transaction_id",
                     "count"
                 ),
+
                 average_risk=(
                     "risk_score",
                     "mean"
@@ -2140,26 +2721,33 @@ elif page == "Entity Network":
             .head(30)
         )
 
-        entity_column = "ip_id"
+        entity_column = (
+            "ip_id"
+        )
 
     else:
 
         entity_summary = (
             data
-            .groupby("customer_id")
+            .groupby(
+                "customer_id"
+            )
             .agg(
                 devices=(
                     "device_id",
                     "nunique"
                 ),
+
                 ips=(
                     "ip_id",
                     "nunique"
                 ),
+
                 transactions=(
                     "transaction_id",
                     "count"
                 ),
+
                 average_risk=(
                     "risk_score",
                     "mean"
@@ -2173,7 +2761,9 @@ elif page == "Entity Network":
             .head(30)
         )
 
-        entity_column = "customer_id"
+        entity_column = (
+            "customer_id"
+        )
 
     st.dataframe(
         entity_summary,
@@ -2231,13 +2821,21 @@ elif page == "Entity Network":
         ]
     ].copy()
 
-    related_display["amount"] = (
-        related_display["amount"]
+    related_display[
+        "amount"
+    ] = (
+        related_display[
+            "amount"
+        ]
         .map(money)
     )
 
-    related_display["risk_score"] = (
-        related_display["risk_score"]
+    related_display[
+        "risk_score"
+    ] = (
+        related_display[
+            "risk_score"
+        ]
         .round(1)
     )
 
@@ -2265,25 +2863,41 @@ elif page == "Data Explorer":
     st.divider()
 
     default_columns = [
+
         "transaction_id",
+
         "customer_id",
+
         "merchant_id",
+
         "amount",
+
         "timestamp",
+
         "fraud_probability",
+
         "anomaly_score",
+
         "graph_risk_score",
+
         "financial_exposure_score",
+
         "risk_score",
+
         "risk_band",
+
         "recommended_action",
-        "final_action"
+
+        "final_action",
     ]
 
     default_columns = [
-        col
-        for col in default_columns
-        if col in data.columns
+
+        column
+
+        for column in default_columns
+
+        if column in data.columns
     ]
 
     selected_columns = st.multiselect(
@@ -2306,7 +2920,9 @@ elif page == "Data Explorer":
 
         csv_output = (
             display_data
-            .to_csv(index=False)
+            .to_csv(
+                index=False
+            )
             .encode("utf-8")
         )
 
@@ -2337,5 +2953,5 @@ st.caption(
 )
 
 st.caption(
-    "Synthetic-data prototype built from the Razorpay modelling pipeline."
+    "Synthetic-data prototype • Razorpay RiskGraph project"
 )
