@@ -46,30 +46,411 @@ ANOMALY_FEATURES = [
 
 
 # ============================================================
-# CLEAN STREAMLIT STYLING
-# No custom HTML components
+# COLOR SYSTEM
+# ============================================================
+
+ORANGE = "#FF6B35"
+ORANGE_LIGHT = "#FF8A5B"
+ORANGE_DARK = "#D94E1F"
+
+BLACK = "#0B0B0D"
+BLACK_2 = "#111114"
+BLACK_3 = "#17171C"
+BLACK_4 = "#1D1D23"
+
+WHITE = "#FFFFFF"
+TEXT_SECONDARY = "#B8B8C2"
+TEXT_MUTED = "#858591"
+
+BORDER = "#2A2A32"
+
+GREEN = "#27C98A"
+GREEN_DARK = "#123D2F"
+
+RED = "#FF4D5A"
+RED_DARK = "#40191D"
+
+AMBER = "#FFB020"
+AMBER_DARK = "#402F0B"
+
+
+# ============================================================
+# GLOBAL STYLING
 # ============================================================
 
 st.markdown(
-    """
+    f"""
     <style>
 
-    .block-container {
+    /* ======================================================
+       GLOBAL
+       ====================================================== */
+
+    .stApp {{
+        background:
+            radial-gradient(
+                circle at 80% 0%,
+                rgba(255,107,53,0.07),
+                transparent 32%
+            ),
+            {BLACK};
+
+        color: {WHITE};
+    }}
+
+    .main {{
+        background: {BLACK};
+    }}
+
+    .block-container {{
         max-width: 1450px;
-        padding-top: 2rem;
-        padding-bottom: 3rem;
-    }
+        padding-top: 2.2rem;
+        padding-bottom: 4rem;
+    }}
 
-    [data-testid="stMetric"] {
-        border: 1px solid rgba(128,128,128,0.20);
+    /* ======================================================
+       TEXT
+       ====================================================== */
+
+    html,
+    body,
+    [class*="css"],
+    p,
+    label,
+    span,
+    div {{
+        color: {WHITE};
+    }}
+
+    p {{
+        color: {TEXT_SECONDARY};
+    }}
+
+    h1 {{
+        color: {WHITE} !important;
+        font-weight: 800 !important;
+        letter-spacing: -1px;
+    }}
+
+    h2 {{
+        color: {WHITE} !important;
+        font-weight: 750 !important;
+    }}
+
+    h3 {{
+        color: {WHITE} !important;
+        font-weight: 700 !important;
+    }}
+
+    h4 {{
+        color: {WHITE} !important;
+    }}
+
+    /* ======================================================
+       SIDEBAR
+       ====================================================== */
+
+    section[data-testid="stSidebar"] {{
+        background:
+            linear-gradient(
+                180deg,
+                {BLACK_3} 0%,
+                {BLACK_2} 100%
+            );
+
+        border-right: 1px solid {BORDER};
+    }}
+
+    section[data-testid="stSidebar"] > div {{
+        background: transparent;
+    }}
+
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3 {{
+        color: {WHITE} !important;
+    }}
+
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] label {{
+        color: {TEXT_SECONDARY} !important;
+    }}
+
+    /* Sidebar radio */
+
+    div[role="radiogroup"] label {{
+        color: {TEXT_SECONDARY} !important;
+    }}
+
+    div[role="radiogroup"] label:hover {{
+        color: {WHITE} !important;
+    }}
+
+    div[role="radiogroup"] label[data-checked="true"] {{
+        color: {ORANGE} !important;
+    }}
+
+    /* ======================================================
+       FILE UPLOADER
+       ====================================================== */
+
+    [data-testid="stFileUploader"] {{
+        background: {BLACK_3};
+        border: 1px solid {BORDER};
         border-radius: 12px;
-        padding: 12px;
-        background: rgba(128,128,128,0.04);
-    }
+        padding: 8px;
+    }}
 
-    .stButton button {
-        border-radius: 8px;
-    }
+    [data-testid="stFileUploader"] section {{
+        background: transparent;
+    }}
+
+    [data-testid="stFileUploaderDropzone"] {{
+        background: {BLACK_4};
+        border: 1px dashed {ORANGE};
+        border-radius: 10px;
+    }}
+
+    [data-testid="stFileUploaderDropzoneInstructions"] {{
+        color: {TEXT_SECONDARY} !important;
+    }}
+
+    /* ======================================================
+       METRIC CARDS
+       ====================================================== */
+
+    [data-testid="stMetric"] {{
+        background:
+            linear-gradient(
+                145deg,
+                {BLACK_3},
+                {BLACK_4}
+            );
+
+        border: 1px solid {BORDER};
+        border-radius: 14px;
+        padding: 18px 18px 16px 18px;
+
+        box-shadow:
+            0 8px 24px rgba(0,0,0,0.20);
+    }}
+
+    [data-testid="stMetric"]:hover {{
+        border-color: rgba(255,107,53,0.45);
+    }}
+
+    [data-testid="stMetricLabel"] {{
+        color: {TEXT_MUTED} !important;
+        font-size: 0.75rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+    }}
+
+    [data-testid="stMetricValue"] {{
+        color: {WHITE} !important;
+        font-weight: 800 !important;
+    }}
+
+    [data-testid="stMetricDelta"] {{
+        color: {ORANGE} !important;
+    }}
+
+    /* ======================================================
+       BUTTONS
+       ====================================================== */
+
+    .stButton > button {{
+        background: {ORANGE};
+        color: #FFFFFF !important;
+        border: 1px solid {ORANGE};
+        border-radius: 9px;
+        font-weight: 700;
+        padding: 0.55rem 1rem;
+        transition: all 0.15s ease;
+    }}
+
+    .stButton > button:hover {{
+        background: {ORANGE_LIGHT};
+        border-color: {ORANGE_LIGHT};
+        color: #FFFFFF !important;
+        box-shadow:
+            0 0 18px rgba(255,107,53,0.25);
+    }}
+
+    .stButton > button:active {{
+        background: {ORANGE_DARK};
+    }}
+
+    /* ======================================================
+       DOWNLOAD BUTTON
+       ====================================================== */
+
+    .stDownloadButton > button {{
+        background: {BLACK_4};
+        color: {ORANGE} !important;
+        border: 1px solid {ORANGE};
+        border-radius: 9px;
+        font-weight: 700;
+    }}
+
+    .stDownloadButton > button:hover {{
+        background: {ORANGE};
+        color: #FFFFFF !important;
+    }}
+
+    /* ======================================================
+       INPUTS
+       ====================================================== */
+
+    input,
+    textarea {{
+        background: {BLACK_3} !important;
+        color: {WHITE} !important;
+        border: 1px solid {BORDER} !important;
+        border-radius: 9px !important;
+    }}
+
+    input:focus,
+    textarea:focus {{
+        border-color: {ORANGE} !important;
+        box-shadow:
+            0 0 0 1px {ORANGE} !important;
+    }}
+
+    /* ======================================================
+       SELECTBOX
+       ====================================================== */
+
+    div[data-baseweb="select"] > div {{
+        background: {BLACK_3} !important;
+        color: {WHITE} !important;
+        border-color: {BORDER} !important;
+        border-radius: 9px !important;
+    }}
+
+    div[data-baseweb="select"] span {{
+        color: {WHITE} !important;
+    }}
+
+    /* ======================================================
+       MULTISELECT
+       ====================================================== */
+
+    div[data-baseweb="select"] span[data-baseweb="tag"] {{
+        background: rgba(255,107,53,0.16) !important;
+        color: {ORANGE_LIGHT} !important;
+        border: 1px solid rgba(255,107,53,0.35);
+    }}
+
+    /* ======================================================
+       SLIDERS
+       ====================================================== */
+
+    div[data-testid="stSlider"] div[role="slider"] {{
+        background: {ORANGE} !important;
+        border-color: {ORANGE} !important;
+    }}
+
+    /* ======================================================
+       DATAFRAME
+       ====================================================== */
+
+    [data-testid="stDataFrame"] {{
+        border: 1px solid {BORDER};
+        border-radius: 12px;
+        overflow: hidden;
+    }}
+
+    /* ======================================================
+       ALERTS
+       ====================================================== */
+
+    [data-testid="stAlert"] {{
+        border-radius: 10px;
+    }}
+
+    /* ======================================================
+       DIVIDERS
+       ====================================================== */
+
+    hr {{
+        border-color: {BORDER} !important;
+        opacity: 0.8;
+    }}
+
+    /* ======================================================
+       CODE
+       ====================================================== */
+
+    code {{
+        background: {BLACK_4} !important;
+        color: {ORANGE_LIGHT} !important;
+    }}
+
+    /* ======================================================
+       LINKS
+       ====================================================== */
+
+    a {{
+        color: {ORANGE} !important;
+    }}
+
+    a:hover {{
+        color: {ORANGE_LIGHT} !important;
+    }}
+
+    /* ======================================================
+       EXPANDERS
+       ====================================================== */
+
+    [data-testid="stExpander"] {{
+        background: {BLACK_3};
+        border: 1px solid {BORDER};
+        border-radius: 12px;
+    }}
+
+    /* ======================================================
+       TABLE HEADER EMPHASIS
+       ====================================================== */
+
+    [data-testid="stDataFrame"] thead tr th {{
+        color: {ORANGE} !important;
+    }}
+
+    /* ======================================================
+       STATUS BOXES
+       ====================================================== */
+
+    .status-online {{
+        background: {GREEN_DARK};
+        border: 1px solid rgba(39,201,138,0.35);
+        color: {GREEN};
+        border-radius: 9px;
+        padding: 10px 14px;
+        font-weight: 700;
+    }}
+
+    .status-upload {{
+        background: rgba(255,107,53,0.10);
+        border: 1px solid rgba(255,107,53,0.30);
+        color: {ORANGE_LIGHT};
+        border-radius: 9px;
+        padding: 10px 14px;
+        font-weight: 700;
+    }}
+
+    /* ======================================================
+       SMALL SECTION LABEL
+       ====================================================== */
+
+    .section-label {{
+        color: {ORANGE};
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }}
 
     </style>
     """,
@@ -82,10 +463,28 @@ st.markdown(
 # ============================================================
 
 def money(value):
+
+    value = float(value)
+
+    if abs(value) >= 10_000_000:
+        return f"₹{value / 10_000_000:.2f}Cr"
+
+    if abs(value) >= 100_000:
+        return f"₹{value / 100_000:.2f}L"
+
+    if abs(value) >= 1_000:
+        return f"₹{value / 1_000:.1f}K"
+
+    return f"₹{value:,.2f}"
+
+
+def money_full(value):
+
     return f"₹{float(value):,.2f}"
 
 
 def percentage(value):
+
     return f"{float(value) * 100:.2f}%"
 
 
@@ -375,9 +774,7 @@ def calculate_anomaly_scores(df):
         :split_index
     ].copy()
 
-    if (
-        "is_fraud" in historical.columns
-    ):
+    if "is_fraud" in historical.columns:
 
         legitimate = historical[
             historical["is_fraud"] == 0
@@ -567,11 +964,6 @@ def calculate_graph_features(df):
 
 # ============================================================
 # COMPLETE RISK PIPELINE
-#
-# IMPORTANT:
-# No @st.cache_data here.
-#
-# This guarantees a newly uploaded CSV is processed again.
 # ============================================================
 
 def run_pipeline(raw_df):
@@ -667,10 +1059,6 @@ def run_pipeline(raw_df):
 
     # --------------------------------------------------------
     # 7. FINAL RISK SCORE
-    #
-    # 50% fraud
-    # 30% anomaly
-    # 20% financial exposure
     # --------------------------------------------------------
 
     df["risk_score"] = (
@@ -782,8 +1170,18 @@ def run_pipeline(raw_df):
 # SIDEBAR
 # ============================================================
 
-st.sidebar.title(
-    "🛡️ RiskGraph AI"
+st.sidebar.markdown(
+    """
+    <div style="
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #FFFFFF;
+        margin-bottom: 4px;
+    ">
+        🛡️ RiskGraph AI
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
 
 st.sidebar.caption(
@@ -792,8 +1190,9 @@ st.sidebar.caption(
 
 st.sidebar.divider()
 
-st.sidebar.subheader(
-    "Data"
+st.sidebar.markdown(
+    '<div class="section-label">DATA</div>',
+    unsafe_allow_html=True,
 )
 
 uploaded_file = st.sidebar.file_uploader(
@@ -805,9 +1204,10 @@ uploaded_file = st.sidebar.file_uploader(
     ),
 )
 
-# ------------------------------------------------------------
+
+# ============================================================
 # DATA SOURCE
-# ------------------------------------------------------------
+# ============================================================
 
 if uploaded_file is not None:
 
@@ -821,8 +1221,13 @@ if uploaded_file is not None:
             f"Uploaded: {uploaded_file.name}"
         )
 
-        st.sidebar.success(
-            f"Loaded {len(raw_data):,} rows"
+        st.sidebar.markdown(
+            f"""
+            <div class="status-upload">
+                ✓ Loaded {len(raw_data):,} rows
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
     except Exception as error:
@@ -858,9 +1263,9 @@ else:
         st.stop()
 
 
-# ------------------------------------------------------------
+# ============================================================
 # BASIC VALIDATION
-# ------------------------------------------------------------
+# ============================================================
 
 if "transaction_id" not in raw_data.columns:
 
@@ -871,9 +1276,9 @@ if "transaction_id" not in raw_data.columns:
     st.stop()
 
 
-# ------------------------------------------------------------
+# ============================================================
 # RUN PIPELINE
-# ------------------------------------------------------------
+# ============================================================
 
 with st.spinner(
     "RiskGraph AI is processing transactions..."
@@ -896,14 +1301,19 @@ with st.spinner(
         st.stop()
 
 
-# ------------------------------------------------------------
+# ============================================================
 # SIDEBAR STATUS
-# ------------------------------------------------------------
+# ============================================================
 
 st.sidebar.divider()
 
-st.sidebar.success(
-    "Risk Engine Online"
+st.sidebar.markdown(
+    """
+    <div class="status-online">
+        ● Risk Engine Online
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
 
 st.sidebar.caption(
@@ -927,8 +1337,9 @@ st.sidebar.metric(
 
 st.sidebar.divider()
 
-st.sidebar.caption(
-    "Decision Policy"
+st.sidebar.markdown(
+    '<div class="section-label">DECISION POLICY</div>',
+    unsafe_allow_html=True,
 )
 
 st.sidebar.caption(
@@ -1155,7 +1566,7 @@ if page == "Command Center":
         "amount"
     ] = priority_display[
         "amount"
-    ].map(money)
+    ].map(money_full)
 
     priority_display[
         "fraud_probability"
@@ -1319,11 +1730,6 @@ elif page == "Investigate":
             search_mask
         ]
 
-    queue = queue.sort_values(
-        "risk_score",
-        ascending=False,
-    )
-
     st.metric(
         "Matching Transactions",
         f"{len(queue):,}"
@@ -1374,10 +1780,6 @@ elif page == "Investigate":
         f"Transaction: {selected_transaction}"
     )
 
-    # --------------------------------------------------------
-    # TOP METRICS
-    # --------------------------------------------------------
-
     a, b, c, d = st.columns(4)
 
     a.metric(
@@ -1399,12 +1801,8 @@ elif page == "Investigate":
 
     d.metric(
         "Amount",
-        money(row["amount"])
+        money_full(row["amount"])
     )
-
-    # --------------------------------------------------------
-    # DECISION
-    # --------------------------------------------------------
 
     st.subheader(
         "Final Decision"
@@ -1427,10 +1825,6 @@ elif page == "Investigate":
         st.success(
             "🟢 APPROVE — Below intervention threshold"
         )
-
-    # --------------------------------------------------------
-    # SIGNALS
-    # --------------------------------------------------------
 
     st.subheader(
         "Risk Signal Breakdown"
@@ -1467,10 +1861,6 @@ elif page == "Investigate":
         hide_index=True,
     )
 
-    # --------------------------------------------------------
-    # EXPLANATION
-    # --------------------------------------------------------
-
     st.subheader(
         "Why did RiskGraph make this decision?"
     )
@@ -1484,10 +1874,6 @@ elif page == "Investigate":
         st.markdown(
             f"• {reason}"
         )
-
-    # --------------------------------------------------------
-    # ENTITY CONTEXT
-    # --------------------------------------------------------
 
     st.subheader(
         "Entity Context"
@@ -1522,10 +1908,6 @@ elif page == "Investigate":
             row["ip_transaction_count"]
         )
     )
-
-    # --------------------------------------------------------
-    # DETAILS
-    # --------------------------------------------------------
 
     st.subheader(
         "Transaction Evidence"
@@ -1574,7 +1956,7 @@ elif page == "Investigate":
                 int(
                     row["behavior_risk_count"]
                 ),
-                money(
+                money_full(
                     row["expected_fraud_loss"]
                 ),
                 row["recommended_action"],
@@ -1814,7 +2196,7 @@ elif page == "Entity Intelligence":
         "amount"
     ] = related_display[
         "amount"
-    ].map(money)
+    ].map(money_full)
 
     related_display[
         "risk_score"
@@ -1993,17 +2375,17 @@ elif page == "Model Intelligence":
 
     b1.metric(
         "False-positive Value",
-        "₹4,83,752.82"
+        "₹4.84L"
     )
 
     b2.metric(
         "Missed-fraud Value",
-        "₹4,292.70"
+        "₹4.29K"
     )
 
     b3.metric(
         "Estimated FP Cost",
-        "₹4,837.53"
+        "₹4.84K"
     )
 
     st.caption(
@@ -2090,30 +2472,22 @@ elif page == "Business Impact":
 
     c1.metric(
         "Baseline Expected Loss",
-        money(
-            baseline_loss
-        )
+        money(baseline_loss)
     )
 
     c2.metric(
         "Residual Expected Loss",
-        money(
-            residual_loss
-        )
+        money(residual_loss)
     )
 
     c3.metric(
         "Estimated Loss Avoided",
-        money(
-            loss_avoided
-        )
+        money(loss_avoided)
     )
 
     c4.metric(
         "Intervention Cost",
-        money(
-            intervention_cost
-        )
+        money(intervention_cost)
     )
 
     st.divider()
@@ -2146,13 +2520,13 @@ elif page == "Business Impact":
         "transaction_value"
     ] = business_table[
         "transaction_value"
-    ].map(money)
+    ].map(money_full)
 
     business_table[
         "expected_fraud_loss"
     ] = business_table[
         "expected_fraud_loss"
-    ].map(money)
+    ].map(money_full)
 
     st.dataframe(
         business_table,
@@ -2168,7 +2542,7 @@ elif page == "Business Impact":
 
 
 # ============================================================
-# TRANSACTIONS / DATA EXPLORER
+# TRANSACTIONS
 # ============================================================
 
 elif page == "Transactions":
@@ -2318,7 +2692,7 @@ elif page == "Transactions":
         "amount"
     ] = display[
         "amount"
-    ].map(money)
+    ].map(money_full)
 
     display[
         "fraud_probability"
