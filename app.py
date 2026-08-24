@@ -23,7 +23,7 @@ st.set_page_config(
 def load_data():
 
     df = pd.read_csv(
-        "data/sample_transactions.csv"
+        "sample_transactions.csv"
     )
 
     return df
