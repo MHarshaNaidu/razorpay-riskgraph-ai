@@ -23,7 +23,7 @@ st.set_page_config(
 # ============================================================
 
 MODEL_PATH = "riskgraph_fraud_model_v2.joblib"
-DATA_PATH = "sample_transactions.csv"
+DEFAULT_DATA_PATH = "sample_transactions.csv"
 
 APPROVE_THRESHOLD = 60
 REVIEW_THRESHOLD = 75
@@ -46,7 +46,8 @@ ANOMALY_FEATURES = [
 
 
 # ============================================================
-# PAGE STYLE
+# CLEAN STREAMLIT STYLING
+# No custom HTML components
 # ============================================================
 
 st.markdown(
@@ -59,73 +60,15 @@ st.markdown(
         padding-bottom: 3rem;
     }
 
-    .hero {
-        padding: 10px 0 25px 0;
+    [data-testid="stMetric"] {
+        border: 1px solid rgba(128,128,128,0.20);
+        border-radius: 12px;
+        padding: 12px;
+        background: rgba(128,128,128,0.04);
     }
 
-    .hero-title {
-        font-size: 44px;
-        font-weight: 800;
-        letter-spacing: -1.5px;
-        margin-bottom: 4px;
-    }
-
-    .hero-subtitle {
-        color: #6b7280;
-        font-size: 16px;
-    }
-
-    .section-title {
-        font-size: 22px;
-        font-weight: 750;
-        margin-top: 25px;
-        margin-bottom: 12px;
-    }
-
-    .decision-card {
-        padding: 18px;
-        border-radius: 14px;
-        border: 1px solid rgba(128,128,128,.20);
-        background: rgba(128,128,128,.04);
-    }
-
-    .decision-title {
-        font-size: 13px;
-        color: #6b7280;
-        margin-bottom: 5px;
-    }
-
-    .decision-value {
-        font-size: 30px;
-        font-weight: 800;
-    }
-
-    .risk-box {
-        padding: 20px;
-        border-radius: 14px;
-        border: 1px solid rgba(128,128,128,.20);
-        background: rgba(128,128,128,.04);
-    }
-
-    .small {
-        font-size: 13px;
-        color: #6b7280;
-    }
-
-    .critical {
-        border-left: 5px solid #dc2626;
-    }
-
-    .high {
-        border-left: 5px solid #ea580c;
-    }
-
-    .moderate {
-        border-left: 5px solid #d97706;
-    }
-
-    .low {
-        border-left: 5px solid #16a34a;
+    .stButton button {
+        border-radius: 8px;
     }
 
     </style>
@@ -135,26 +78,20 @@ st.markdown(
 
 
 # ============================================================
-# HELPERS
+# HELPER FUNCTIONS
 # ============================================================
 
 def money(value):
     return f"₹{float(value):,.2f}"
 
 
-def pct(value):
+def percentage(value):
     return f"{float(value) * 100:.2f}%"
 
 
-def action_icon(action):
-    if action == "REVIEW":
-        return "🔴"
-    if action == "VERIFY":
-        return "🟠"
-    return "🟢"
-
-
 def risk_band(score):
+
+    score = float(score)
 
     if score >= 75:
         return "CRITICAL"
@@ -168,7 +105,7 @@ def risk_band(score):
     return "LOW"
 
 
-def explanation(row):
+def risk_reasons(row):
 
     reasons = []
 
@@ -205,8 +142,8 @@ def explanation(row):
     if row["transactions_last_10min"] >= 4:
         reasons.append(
             f"High transaction velocity: "
-            f"{int(row['transactions_last_10min'])} transactions "
-            f"in the last 10 minutes"
+            f"{int(row['transactions_last_10min'])} "
+            f"transactions in 10 minutes"
         )
 
     if row["failed_attempts"] >= 3:
@@ -215,31 +152,39 @@ def explanation(row):
             f"{int(row['failed_attempts'])}"
         )
 
+    if row["location_change"]:
+        reasons.append(
+            "Location change detected"
+        )
+
     if row["new_device"]:
-        reasons.append("New device detected")
+        reasons.append(
+            "New device detected"
+        )
 
     if row["new_account"]:
-        reasons.append("New account detected")
-
-    if row["location_change"]:
-        reasons.append("Location change detected")
+        reasons.append(
+            "New account detected"
+        )
 
     if row["amount_deviation"] > 3:
         reasons.append(
-            f"Amount is {row['amount_deviation']:.1f}× "
-            f"the normal transaction amount"
+            f"Transaction amount is "
+            f"{row['amount_deviation']:.1f}× "
+            f"the normal amount"
         )
 
     if not reasons:
         reasons.append(
-            "No major risk indicator crossed the configured thresholds"
+            "No major risk indicators crossed "
+            "the configured thresholds"
         )
 
     return reasons
 
 
 # ============================================================
-# MODEL
+# MODEL LOADING
 # ============================================================
 
 @st.cache_resource
@@ -251,7 +196,7 @@ def load_model():
 
     if not isinstance(bundle, dict):
         raise ValueError(
-            "Invalid RiskGraph model bundle."
+            "Invalid model bundle."
         )
 
     if "model" not in bundle:
@@ -270,11 +215,15 @@ def load_model():
     )
 
 
+# ============================================================
+# DEFAULT DATA
+# ============================================================
+
 @st.cache_data
-def load_data():
+def load_default_data():
 
     return pd.read_csv(
-        DATA_PATH
+        DEFAULT_DATA_PATH
     )
 
 
@@ -286,7 +235,7 @@ def engineer_features(df):
 
     df = df.copy()
 
-    required = [
+    required_columns = [
         "transaction_id",
         "customer_id",
         "merchant_id",
@@ -304,13 +253,15 @@ def engineer_features(df):
     ]
 
     missing = [
-        col for col in required
-        if col not in df.columns
+        column
+        for column in required_columns
+        if column not in df.columns
     ]
 
     if missing:
+
         raise ValueError(
-            "Missing columns: "
+            "Missing required columns: "
             + ", ".join(missing)
         )
 
@@ -320,8 +271,9 @@ def engineer_features(df):
     )
 
     if df["timestamp"].isna().any():
+
         raise ValueError(
-            "Invalid timestamp detected."
+            "Some timestamp values could not be parsed."
         )
 
     numeric_columns = [
@@ -334,12 +286,14 @@ def engineer_features(df):
         "amount_deviation",
     ]
 
-    for col in numeric_columns:
+    for column in numeric_columns:
 
-        df[col] = pd.to_numeric(
-            df[col],
+        df[column] = pd.to_numeric(
+            df[column],
             errors="coerce"
         ).fillna(0)
+
+    # Time features
 
     df["hour"] = (
         df["timestamp"].dt.hour
@@ -353,6 +307,8 @@ def engineer_features(df):
         df["day_of_week"] >= 5
     ).astype(int)
 
+    # Amount features
+
     df["log_amount"] = np.log1p(
         df["amount"]
     )
@@ -361,13 +317,19 @@ def engineer_features(df):
         df["amount"] > 10000
     ).astype(int)
 
+    # Velocity
+
     df["high_velocity"] = (
         df["transactions_last_10min"] >= 4
     ).astype(int)
 
+    # Failed attempts
+
     df["high_failure_activity"] = (
         df["failed_attempts"] >= 3
     ).astype(int)
+
+    # Device/account age
 
     df["new_device"] = (
         df["device_age_days"] < 14
@@ -376,6 +338,8 @@ def engineer_features(df):
     df["new_account"] = (
         df["account_age_days"] < 60
     ).astype(int)
+
+    # Behavioral risk
 
     df["behavior_risk_count"] = (
         df["high_velocity"]
@@ -403,15 +367,17 @@ def calculate_anomaly_scores(df):
         .reset_index(drop=True)
     )
 
-    split = int(
+    split_index = int(
         len(work) * 0.80
     )
 
     historical = work.iloc[
-        :split
+        :split_index
     ].copy()
 
-    if "is_fraud" in historical.columns:
+    if (
+        "is_fraud" in historical.columns
+    ):
 
         legitimate = historical[
             historical["is_fraud"] == 0
@@ -422,44 +388,49 @@ def calculate_anomaly_scores(df):
         legitimate = historical.copy()
 
     if len(legitimate) < 100:
+
         legitimate = historical.copy()
 
-    detector = IsolationForest(
+    anomaly_model = IsolationForest(
         n_estimators=300,
         contamination="auto",
         random_state=42,
         n_jobs=-1,
     )
 
-    detector.fit(
-        legitimate[
-            ANOMALY_FEATURES
-        ]
+    X_train = legitimate[
+        ANOMALY_FEATURES
+    ]
+
+    X_all = work[
+        ANOMALY_FEATURES
+    ]
+
+    anomaly_model.fit(
+        X_train
     )
 
-    training_scores = -detector.decision_function(
-        legitimate[
-            ANOMALY_FEATURES
-        ]
+    train_scores = (
+        -anomaly_model
+        .decision_function(X_train)
     )
 
-    all_scores = -detector.decision_function(
-        work[
-            ANOMALY_FEATURES
-        ]
+    all_scores = (
+        -anomaly_model
+        .decision_function(X_all)
     )
 
-    reference = np.sort(
-        training_scores
+    sorted_scores = np.sort(
+        train_scores
     )
 
     percentiles = (
         np.searchsorted(
-            reference,
+            sorted_scores,
             all_scores,
             side="right"
         )
-        / len(reference)
+        / len(sorted_scores)
     )
 
     work["anomaly_score"] = np.clip(
@@ -472,7 +443,7 @@ def calculate_anomaly_scores(df):
 
 
 # ============================================================
-# ENTITY GRAPH ENGINE
+# ENTITY / GRAPH ENGINE
 # ============================================================
 
 def calculate_graph_features(df):
@@ -483,25 +454,27 @@ def calculate_graph_features(df):
         .reset_index(drop=True)
     )
 
-    split = int(
+    split_index = int(
         len(work) * 0.80
     )
 
     historical = work.iloc[
-        :split
+        :split_index
     ].copy()
 
     device_customers = (
         historical
-        .groupby("device_id")
-        ["customer_id"]
+        .groupby("device_id")[
+            "customer_id"
+        ]
         .nunique()
     )
 
     ip_customers = (
         historical
-        .groupby("ip_id")
-        ["customer_id"]
+        .groupby("ip_id")[
+            "customer_id"
+        ]
         .nunique()
     )
 
@@ -594,9 +567,13 @@ def calculate_graph_features(df):
 
 # ============================================================
 # COMPLETE RISK PIPELINE
+#
+# IMPORTANT:
+# No @st.cache_data here.
+#
+# This guarantees a newly uploaded CSV is processed again.
 # ============================================================
 
-@st.cache_data
 def run_pipeline(raw_df):
 
     df = engineer_features(
@@ -612,35 +589,63 @@ def run_pipeline(raw_df):
     ]
 
     if missing_features:
+
         raise ValueError(
             "Model features missing: "
             + ", ".join(missing_features)
         )
 
-    # 1. Supervised fraud model
+    # --------------------------------------------------------
+    # 1. FRAUD MODEL
+    # --------------------------------------------------------
+
+    X = df[
+        saved_features
+    ]
+
     df["fraud_probability"] = (
-        model.predict_proba(
-            df[saved_features]
-        )[:, 1]
+        model
+        .predict_proba(X)[:, 1]
     )
 
-    # 2. Behavioral anomaly
+    # --------------------------------------------------------
+    # 2. ANOMALY ENGINE
+    # --------------------------------------------------------
+
     df = calculate_anomaly_scores(
         df
     )
 
-    # 3. Entity graph
+    # --------------------------------------------------------
+    # 3. ENTITY GRAPH
+    # --------------------------------------------------------
+
     df = calculate_graph_features(
         df
     )
 
-    # 4. Expected fraud loss
+    # --------------------------------------------------------
+    # 4. FRAUD SIGNAL
+    # --------------------------------------------------------
+
+    df["fraud_signal"] = (
+        df["fraud_probability"]
+        * 100
+    )
+
+    # --------------------------------------------------------
+    # 5. EXPECTED FRAUD LOSS
+    # --------------------------------------------------------
+
     df["expected_fraud_loss"] = (
         df["fraud_probability"]
         * df["amount"]
     )
 
-    # 5. Financial exposure
+    # --------------------------------------------------------
+    # 6. FINANCIAL EXPOSURE
+    # --------------------------------------------------------
+
     loss_cap = (
         df["expected_fraud_loss"]
         .quantile(0.95)
@@ -652,23 +657,26 @@ def run_pipeline(raw_df):
         * 100
     )
 
-    df["financial_exposure_score"] = np.clip(
-        df["financial_exposure_score"],
-        0,
-        100
+    df["financial_exposure_score"] = (
+        np.clip(
+            df["financial_exposure_score"],
+            0,
+            100
+        )
     )
 
-    # 6. Final RiskGraph score
+    # --------------------------------------------------------
+    # 7. FINAL RISK SCORE
     #
     # 50% fraud
     # 30% anomaly
     # 20% financial exposure
+    # --------------------------------------------------------
 
     df["risk_score"] = (
 
         0.50
-        * df["fraud_probability"]
-        * 100
+        * df["fraud_signal"]
 
         +
 
@@ -687,7 +695,9 @@ def run_pipeline(raw_df):
         100
     )
 
-    # 7. Cost-aware recommendation
+    # --------------------------------------------------------
+    # 8. COST-AWARE RECOMMENDATION
+    # --------------------------------------------------------
 
     df["approve_cost"] = (
         df["expected_fraud_loss"]
@@ -707,16 +717,14 @@ def run_pipeline(raw_df):
         * (1 - REVIEW_FRAUD_REDUCTION)
     )
 
-    costs = df[
-        [
-            "approve_cost",
-            "verify_cost",
-            "review_cost"
-        ]
+    cost_columns = [
+        "approve_cost",
+        "verify_cost",
+        "review_cost",
     ]
 
     df["recommended_action"] = (
-        costs
+        df[cost_columns]
         .idxmin(axis=1)
         .map(
             {
@@ -727,7 +735,9 @@ def run_pipeline(raw_df):
         )
     )
 
-    # 8. Final decision policy
+    # --------------------------------------------------------
+    # 9. FINAL DECISION POLICY
+    # --------------------------------------------------------
 
     df["final_action"] = np.select(
         [
@@ -737,16 +747,16 @@ def run_pipeline(raw_df):
             df["risk_score"]
             < REVIEW_THRESHOLD,
         ],
-
         [
             "APPROVE",
             "VERIFY",
         ],
-
-        default="REVIEW"
+        default="REVIEW",
     )
 
-    # 9. Risk band
+    # --------------------------------------------------------
+    # 10. RISK BAND
+    # --------------------------------------------------------
 
     df["risk_band"] = pd.cut(
         df["risk_score"],
@@ -769,30 +779,11 @@ def run_pipeline(raw_df):
 
 
 # ============================================================
-# LOAD DATA
-# ============================================================
-
-try:
-
-    raw_data = load_data()
-
-except Exception as error:
-
-    st.error(
-        "Could not load sample_transactions.csv"
-    )
-
-    st.exception(error)
-
-    st.stop()
-
-
-# ============================================================
 # SIDEBAR
 # ============================================================
 
-st.sidebar.markdown(
-    "# 🛡️ RiskGraph AI"
+st.sidebar.title(
+    "🛡️ RiskGraph AI"
 )
 
 st.sidebar.caption(
@@ -801,10 +792,22 @@ st.sidebar.caption(
 
 st.sidebar.divider()
 
-uploaded_file = st.sidebar.file_uploader(
-    "Upload transactions",
-    type=["csv"]
+st.sidebar.subheader(
+    "Data"
 )
+
+uploaded_file = st.sidebar.file_uploader(
+    "Upload transaction CSV",
+    type=["csv"],
+    help=(
+        "Upload a CSV containing the same transaction "
+        "fields used by the RiskGraph model."
+    ),
+)
+
+# ------------------------------------------------------------
+# DATA SOURCE
+# ------------------------------------------------------------
 
 if uploaded_file is not None:
 
@@ -814,37 +817,136 @@ if uploaded_file is not None:
             uploaded_file
         )
 
+        data_source = (
+            f"Uploaded: {uploaded_file.name}"
+        )
+
+        st.sidebar.success(
+            f"Loaded {len(raw_data):,} rows"
+        )
+
     except Exception as error:
 
         st.sidebar.error(
-            "Unable to read CSV."
+            f"CSV could not be read: {error}"
         )
 
         st.stop()
 
+else:
 
-try:
+    try:
 
-    data = run_pipeline(
-        raw_data
-    )
+        raw_data = load_default_data()
 
-except Exception as error:
+        data_source = (
+            "sample_transactions.csv"
+        )
+
+        st.sidebar.info(
+            f"Demo dataset: {len(raw_data):,} rows"
+        )
+
+    except Exception as error:
+
+        st.sidebar.error(
+            "sample_transactions.csv could not be loaded."
+        )
+
+        st.exception(error)
+
+        st.stop()
+
+
+# ------------------------------------------------------------
+# BASIC VALIDATION
+# ------------------------------------------------------------
+
+if "transaction_id" not in raw_data.columns:
 
     st.error(
-        "RiskGraph AI pipeline failed."
+        "This CSV does not contain transaction_id."
     )
-
-    st.exception(error)
 
     st.stop()
 
 
+# ------------------------------------------------------------
+# RUN PIPELINE
+# ------------------------------------------------------------
+
+with st.spinner(
+    "RiskGraph AI is processing transactions..."
+):
+
+    try:
+
+        data = run_pipeline(
+            raw_data
+        )
+
+    except Exception as error:
+
+        st.error(
+            "Risk pipeline failed."
+        )
+
+        st.exception(error)
+
+        st.stop()
+
+
+# ------------------------------------------------------------
+# SIDEBAR STATUS
+# ------------------------------------------------------------
+
+st.sidebar.divider()
+
 st.sidebar.success(
-    "Risk engine online"
+    "Risk Engine Online"
+)
+
+st.sidebar.caption(
+    data_source
+)
+
+st.sidebar.metric(
+    "Processed Transactions",
+    f"{len(data):,}"
+)
+
+intervention_count = (
+    data["final_action"]
+    != "APPROVE"
+).sum()
+
+st.sidebar.metric(
+    "Risk Interventions",
+    f"{intervention_count:,}"
 )
 
 st.sidebar.divider()
+
+st.sidebar.caption(
+    "Decision Policy"
+)
+
+st.sidebar.caption(
+    "0 – 59.99  → APPROVE"
+)
+
+st.sidebar.caption(
+    "60 – 74.99 → VERIFY"
+)
+
+st.sidebar.caption(
+    "75 – 100   → REVIEW"
+)
+
+
+# ============================================================
+# NAVIGATION
+# ============================================================
 
 page = st.sidebar.radio(
     "WORKSPACE",
@@ -852,38 +954,10 @@ page = st.sidebar.radio(
         "Command Center",
         "Investigate",
         "Entity Intelligence",
-        "Model & Results",
+        "Model Intelligence",
         "Business Impact",
         "Transactions",
-    ]
-)
-
-st.sidebar.divider()
-
-st.sidebar.metric(
-    "Transactions",
-    f"{len(data):,}"
-)
-
-st.sidebar.metric(
-    "Interventions",
-    f"{(data['final_action'] != 'APPROVE').sum():,}"
-)
-
-st.sidebar.caption(
-    "Risk policy"
-)
-
-st.sidebar.caption(
-    "0–59.99  APPROVE"
-)
-
-st.sidebar.caption(
-    "60–74.99  VERIFY"
-)
-
-st.sidebar.caption(
-    "75–100  REVIEW"
+    ],
 )
 
 
@@ -893,164 +967,165 @@ st.sidebar.caption(
 
 if page == "Command Center":
 
-    st.markdown(
-        """
-        <div class="hero">
-
-            <div class="hero-title">
-                RiskGraph AI
-            </div>
-
-            <div class="hero-subtitle">
-                Payment Risk Command Center
-                · Detect · Explain · Decide
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+    st.title(
+        "🛡️ RiskGraph AI"
     )
 
-    total = len(data)
+    st.subheader(
+        "Payment Risk Command Center"
+    )
+
+    st.caption(
+        "Detect · Explain · Decide"
+    )
+
+    st.divider()
+
+    total_transactions = len(
+        data
+    )
 
     total_value = data[
         "amount"
     ].sum()
 
-    approve = (
+    approve_count = (
         data["final_action"]
         == "APPROVE"
     ).sum()
 
-    verify = (
+    verify_count = (
         data["final_action"]
         == "VERIFY"
     ).sum()
 
-    review = (
+    review_count = (
         data["final_action"]
         == "REVIEW"
-    ).sum()
-
-    critical = (
-        data["risk_score"]
-        >= 75
     ).sum()
 
     c1, c2, c3, c4, c5 = st.columns(5)
 
     c1.metric(
         "Transactions",
-        f"{total:,}"
+        f"{total_transactions:,}"
     )
 
     c2.metric(
-        "Value monitored",
+        "Transaction Value",
         money(total_value)
     )
 
     c3.metric(
-        "Auto-approved",
-        f"{approve:,}"
+        "Approved",
+        f"{approve_count:,}"
     )
 
     c4.metric(
-        "Verification",
-        f"{verify:,}"
+        "Verify",
+        f"{verify_count:,}"
     )
 
     c5.metric(
-        "High-risk review",
-        f"{review:,}"
+        "Review",
+        f"{review_count:,}"
     )
 
     st.divider()
 
     left, right = st.columns(
-        [1.55, 1]
+        [1.5, 1]
     )
+
+    # --------------------------------------------------------
+    # RISK DISTRIBUTION
+    # --------------------------------------------------------
 
     with left:
 
-        st.markdown(
-            '<div class="section-title">'
-            'Risk Distribution'
-            '</div>',
-            unsafe_allow_html=True
+        st.subheader(
+            "Risk Score Distribution"
         )
 
-        histogram = pd.cut(
-            data["risk_score"],
-            bins=np.arange(
-                0,
-                105,
-                5
-            ),
-            include_lowest=True
-        )
-
-        counts = (
-            histogram
-            .value_counts()
-            .sort_index()
-        )
-
-        counts.index = [
-            f"{int(x.left)}–{int(x.right)}"
-            for x in counts.index
+        bins = [
+            0,
+            30,
+            60,
+            75,
+            100.01,
         ]
 
+        labels = [
+            "LOW",
+            "MODERATE",
+            "HIGH",
+            "CRITICAL",
+        ]
+
+        distribution = pd.cut(
+            data["risk_score"],
+            bins=bins,
+            labels=labels,
+            include_lowest=True,
+        )
+
+        risk_counts = (
+            distribution
+            .value_counts()
+            .reindex(labels)
+            .fillna(0)
+            .astype(int)
+        )
+
         st.bar_chart(
-            counts,
-            height=350
+            risk_counts,
+            height=350,
         )
 
         st.caption(
-            "Risk score thresholds: "
-            "60 = VERIFY · 75 = REVIEW"
+            "LOW < 30 · MODERATE 30–59.99 · "
+            "HIGH 60–74.99 · CRITICAL ≥ 75"
         )
+
+    # --------------------------------------------------------
+    # DECISION MIX
+    # --------------------------------------------------------
 
     with right:
 
-        st.markdown(
-            '<div class="section-title">'
-            'Decision Mix'
-            '</div>',
-            unsafe_allow_html=True
+        st.subheader(
+            "Decision Mix"
         )
 
-        decision_mix = pd.Series(
+        decisions = pd.Series(
             {
-                "APPROVE": approve,
-                "VERIFY": verify,
-                "REVIEW": review,
+                "APPROVE": approve_count,
+                "VERIFY": verify_count,
+                "REVIEW": review_count,
             }
         )
 
         st.bar_chart(
-            decision_mix,
-            height=260
+            decisions,
+            height=300,
         )
 
         st.markdown(
-            """
-            **Decision policy**
+            "🟢 **APPROVE** — low intervention risk"
+        )
 
-            🟢 APPROVE — below 60
+        st.markdown(
+            "🟠 **VERIFY** — additional verification"
+        )
 
-            🟠 VERIFY — 60 to 74.99
-
-            🔴 REVIEW — 75 or higher
-            """
+        st.markdown(
+            "🔴 **REVIEW** — analyst investigation"
         )
 
     st.divider()
 
-    st.markdown(
-        '<div class="section-title">'
-        'Priority Risk Queue'
-        '</div>',
-        unsafe_allow_html=True
+    st.subheader(
+        "Priority Risk Queue"
     )
 
     priority = (
@@ -1059,7 +1134,7 @@ if page == "Command Center":
             "risk_score",
             ascending=False
         )
-        .head(12)
+        .head(15)
         .copy()
     )
 
@@ -1076,29 +1151,52 @@ if page == "Command Center":
         ]
     ].copy()
 
-    priority_display["amount"] = (
-        priority_display["amount"]
-        .map(money)
-    )
+    priority_display[
+        "amount"
+    ] = priority_display[
+        "amount"
+    ].map(money)
 
     priority_display[
         "fraud_probability"
-    ] = (
-        priority_display[
-            "fraud_probability"
-        ].map(pct)
-    )
+    ] = priority_display[
+        "fraud_probability"
+    ].map(percentage)
+
+    priority_display[
+        "anomaly_score"
+    ] = priority_display[
+        "anomaly_score"
+    ].round(1)
+
+    priority_display[
+        "graph_risk_score"
+    ] = priority_display[
+        "graph_risk_score"
+    ].round(1)
+
+    priority_display[
+        "financial_exposure_score"
+    ] = priority_display[
+        "financial_exposure_score"
+    ].round(1)
+
+    priority_display[
+        "risk_score"
+    ] = priority_display[
+        "risk_score"
+    ].round(1)
 
     st.dataframe(
         priority_display,
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
     )
 
     st.info(
-        "RiskGraph combines supervised fraud prediction, "
-        "behavioral anomaly detection, entity relationships "
-        "and financial exposure into a final decision."
+        "RiskGraph combines fraud probability, behavioral "
+        "anomaly, entity intelligence and financial exposure "
+        "into a final 0–100 risk score."
     )
 
 
@@ -1108,143 +1206,217 @@ if page == "Command Center":
 
 elif page == "Investigate":
 
-    st.markdown(
-        """
-        <div class="hero">
-
-            <div class="hero-title">
-                Transaction Investigation
-            </div>
-
-            <div class="hero-subtitle">
-                Understand exactly why RiskGraph AI
-                assigned a transaction its decision.
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+    st.title(
+        "🔎 Transaction Investigation"
     )
+
+    st.subheader(
+        "Investigate why a payment received its risk decision."
+    )
+
+    st.divider()
 
     search = st.text_input(
         "Search transaction, customer, merchant, device or IP",
-        placeholder="Example: TX_0009808"
+        placeholder="Example: TX_0013175",
     )
 
-    candidates = data.copy()
+    decision_filter = st.multiselect(
+        "Decision filter",
+        [
+            "APPROVE",
+            "VERIFY",
+            "REVIEW",
+        ],
+        default=[
+            "VERIFY",
+            "REVIEW",
+        ],
+    )
+
+    minimum_risk = st.slider(
+        "Minimum risk score",
+        0,
+        100,
+        0,
+    )
+
+    queue = data[
+        data["final_action"]
+        .isin(decision_filter)
+        &
+        (
+            data["risk_score"]
+            >= minimum_risk
+        )
+    ].copy()
 
     if search.strip():
 
-        q = search.lower().strip()
-
-        mask = (
-            candidates[
-                "transaction_id"
-            ].astype(str)
-            .str.lower()
-            .str.contains(q)
-
-            |
-
-            candidates[
-                "customer_id"
-            ].astype(str)
-            .str.lower()
-            .str.contains(q)
-
-            |
-
-            candidates[
-                "merchant_id"
-            ].astype(str)
-            .str.lower()
-            .str.contains(q)
-
-            |
-
-            candidates[
-                "device_id"
-            ].astype(str)
-            .str.lower()
-            .str.contains(q)
-
-            |
-
-            candidates[
-                "ip_id"
-            ].astype(str)
-            .str.lower()
-            .str.contains(q)
+        query = (
+            search
+            .strip()
+            .lower()
         )
 
-        candidates = candidates[
-            mask
+        search_mask = (
+            queue[
+                "transaction_id"
+            ]
+            .astype(str)
+            .str.lower()
+            .str.contains(
+                query,
+                na=False
+            )
+            |
+
+            queue[
+                "customer_id"
+            ]
+            .astype(str)
+            .str.lower()
+            .str.contains(
+                query,
+                na=False
+            )
+            |
+
+            queue[
+                "merchant_id"
+            ]
+            .astype(str)
+            .str.lower()
+            .str.contains(
+                query,
+                na=False
+            )
+            |
+
+            queue[
+                "device_id"
+            ]
+            .astype(str)
+            .str.lower()
+            .str.contains(
+                query,
+                na=False
+            )
+            |
+
+            queue[
+                "ip_id"
+            ]
+            .astype(str)
+            .str.lower()
+            .str.contains(
+                query,
+                na=False
+            )
+        )
+
+        queue = queue[
+            search_mask
         ]
 
-    if candidates.empty:
+    queue = queue.sort_values(
+        "risk_score",
+        ascending=False,
+    )
+
+    st.metric(
+        "Matching Transactions",
+        f"{len(queue):,}"
+    )
+
+    if queue.empty:
 
         st.warning(
-            "No matching transaction found."
+            "No transactions match the current filters."
         )
 
         st.stop()
 
-    candidates = candidates.sort_values(
-        "risk_score",
-        ascending=False
+    st.dataframe(
+        queue[
+            [
+                "transaction_id",
+                "customer_id",
+                "amount",
+                "fraud_probability",
+                "anomaly_score",
+                "graph_risk_score",
+                "risk_score",
+                "final_action",
+            ]
+        ],
+        use_container_width=True,
+        hide_index=True,
     )
-
-    selected = st.selectbox(
-        "Select transaction",
-        candidates[
-            "transaction_id"
-        ].tolist()
-    )
-
-    row = candidates[
-        candidates["transaction_id"]
-        == selected
-    ].iloc[0]
 
     st.divider()
 
-    st.subheader(
-        f"Investigation: {selected}"
+    selected_transaction = st.selectbox(
+        "Open transaction investigation",
+        queue[
+            "transaction_id"
+        ].tolist(),
     )
 
-    c1, c2, c3, c4 = st.columns(4)
+    row = queue[
+        queue[
+            "transaction_id"
+        ]
+        == selected_transaction
+    ].iloc[0]
 
-    c1.metric(
+    st.subheader(
+        f"Transaction: {selected_transaction}"
+    )
+
+    # --------------------------------------------------------
+    # TOP METRICS
+    # --------------------------------------------------------
+
+    a, b, c, d = st.columns(4)
+
+    a.metric(
         "Risk Score",
         f"{row['risk_score']:.1f}/100"
     )
 
-    c2.metric(
+    b.metric(
         "Fraud Probability",
-        pct(
+        percentage(
             row["fraud_probability"]
         )
     )
 
-    c3.metric(
-        "Anomaly",
+    c.metric(
+        "Anomaly Score",
         f"{row['anomaly_score']:.1f}/100"
     )
 
-    c4.metric(
-        "Transaction",
+    d.metric(
+        "Amount",
         money(row["amount"])
     )
 
-    action = row["final_action"]
+    # --------------------------------------------------------
+    # DECISION
+    # --------------------------------------------------------
 
-    if action == "REVIEW":
+    st.subheader(
+        "Final Decision"
+    )
+
+    if row["final_action"] == "REVIEW":
 
         st.error(
             "🔴 REVIEW — High-risk transaction"
         )
 
-    elif action == "VERIFY":
+    elif row["final_action"] == "VERIFY":
 
         st.warning(
             "🟠 VERIFY — Additional verification required"
@@ -1256,23 +1428,23 @@ elif page == "Investigate":
             "🟢 APPROVE — Below intervention threshold"
         )
 
-    st.markdown(
-        '<div class="section-title">'
-        'Risk Signal Breakdown'
-        '</div>',
-        unsafe_allow_html=True
+    # --------------------------------------------------------
+    # SIGNALS
+    # --------------------------------------------------------
+
+    st.subheader(
+        "Risk Signal Breakdown"
     )
 
-    signals = pd.DataFrame(
+    signal_table = pd.DataFrame(
         {
             "Signal": [
                 "Fraud probability",
                 "Behavior anomaly",
-                "Entity graph",
+                "Graph risk",
                 "Financial exposure",
-                "Final risk",
+                "Final risk score",
             ],
-
             "Score": [
                 row["fraud_probability"] * 100,
                 row["anomaly_score"],
@@ -1283,79 +1455,83 @@ elif page == "Investigate":
         }
     )
 
-    signals["Score"] = (
-        signals["Score"]
-        .round(2)
-    )
+    signal_table[
+        "Score"
+    ] = signal_table[
+        "Score"
+    ].round(2)
 
     st.dataframe(
-        signals,
+        signal_table,
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
     )
 
-    st.markdown(
-        '<div class="section-title">'
-        'Why this decision?'
-        '</div>',
-        unsafe_allow_html=True
+    # --------------------------------------------------------
+    # EXPLANATION
+    # --------------------------------------------------------
+
+    st.subheader(
+        "Why did RiskGraph make this decision?"
     )
 
-    reasons = explanation(
+    reasons = risk_reasons(
         row
     )
 
     for reason in reasons:
 
-        st.write(
-            "• " + reason
+        st.markdown(
+            f"• {reason}"
         )
 
-    st.markdown(
-        '<div class="section-title">'
-        'Entity Context'
-        '</div>',
-        unsafe_allow_html=True
+    # --------------------------------------------------------
+    # ENTITY CONTEXT
+    # --------------------------------------------------------
+
+    st.subheader(
+        "Entity Context"
     )
 
     e1, e2, e3, e4 = st.columns(4)
 
     e1.metric(
-        "Device customers",
+        "Device Customers",
         int(
             row["device_customer_count"]
         )
     )
 
     e2.metric(
-        "IP customers",
+        "IP Customers",
         int(
             row["ip_customer_count"]
         )
     )
 
     e3.metric(
-        "Device transactions",
+        "Device Transactions",
         int(
             row["device_transaction_count"]
         )
     )
 
     e4.metric(
-        "IP transactions",
+        "IP Transactions",
         int(
             row["ip_transaction_count"]
         )
     )
 
-    st.markdown(
-        '<div class="section-title">'
-        'Transaction Evidence'
-        '</div>',
-        unsafe_allow_html=True
+    # --------------------------------------------------------
+    # DETAILS
+    # --------------------------------------------------------
+
+    st.subheader(
+        "Transaction Evidence"
     )
 
-    evidence = pd.DataFrame(
+    details = pd.DataFrame(
         {
             "Field": [
                 "Customer",
@@ -1408,9 +1584,9 @@ elif page == "Investigate":
     )
 
     st.dataframe(
-        evidence,
+        details,
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
     )
 
 
@@ -1420,36 +1596,29 @@ elif page == "Investigate":
 
 elif page == "Entity Intelligence":
 
-    st.markdown(
-        """
-        <div class="hero">
-
-            <div class="hero-title">
-                Entity Intelligence
-            </div>
-
-            <div class="hero-subtitle">
-                Investigate device, IP and customer relationships
-                that provide additional fraud context.
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+    st.title(
+        "🕸️ Entity Intelligence"
     )
 
+    st.subheader(
+        "Investigate relationships between customers, "
+        "devices and IP addresses."
+    )
+
+    st.divider()
+
     entity_type = st.selectbox(
-        "Entity",
+        "Select entity type",
         [
             "Device",
             "IP Address",
             "Customer",
-        ]
+        ],
     )
 
     if entity_type == "Device":
 
-        entity_table = (
+        entity_summary = (
             data
             .groupby("device_id")
             .agg(
@@ -1464,16 +1633,15 @@ elif page == "Entity Intelligence":
                 average_risk=(
                     "risk_score",
                     "mean"
-                )
+                ),
             )
             .sort_values(
                 [
                     "customers",
-                    "transactions"
+                    "transactions",
                 ],
-                ascending=False
+                ascending=False,
             )
-            .head(30)
             .reset_index()
         )
 
@@ -1481,7 +1649,7 @@ elif page == "Entity Intelligence":
 
     elif entity_type == "IP Address":
 
-        entity_table = (
+        entity_summary = (
             data
             .groupby("ip_id")
             .agg(
@@ -1496,16 +1664,15 @@ elif page == "Entity Intelligence":
                 average_risk=(
                     "risk_score",
                     "mean"
-                )
+                ),
             )
             .sort_values(
                 [
                     "customers",
-                    "transactions"
+                    "transactions",
                 ],
-                ascending=False
+                ascending=False,
             )
-            .head(30)
             .reset_index()
         )
 
@@ -1513,7 +1680,7 @@ elif page == "Entity Intelligence":
 
     else:
 
-        entity_table = (
+        entity_summary = (
             data
             .groupby("customer_id")
             .agg(
@@ -1532,39 +1699,53 @@ elif page == "Entity Intelligence":
                 average_risk=(
                     "risk_score",
                     "mean"
-                )
+                ),
             )
             .sort_values(
                 [
                     "transactions",
-                    "average_risk"
+                    "average_risk",
                 ],
-                ascending=False
+                ascending=False,
             )
-            .head(30)
             .reset_index()
         )
 
         entity_column = "customer_id"
 
-    st.dataframe(
-        entity_table,
-        use_container_width=True,
-        hide_index=True
+    st.subheader(
+        "Highest-activity entities"
     )
 
-    st.markdown(
-        '<div class="section-title">'
-        'Inspect Entity'
-        '</div>',
-        unsafe_allow_html=True
+    display_entities = (
+        entity_summary
+        .head(30)
+        .copy()
+    )
+
+    display_entities[
+        "average_risk"
+    ] = display_entities[
+        "average_risk"
+    ].round(2)
+
+    st.dataframe(
+        display_entities,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    st.divider()
+
+    st.subheader(
+        "Inspect Entity"
     )
 
     selected_entity = st.selectbox(
-        "Select",
-        entity_table[
+        "Select entity",
+        display_entities[
             entity_column
-        ].tolist()
+        ].tolist(),
     )
 
     if entity_column == "device_id":
@@ -1588,31 +1769,28 @@ elif page == "Entity Intelligence":
             == selected_entity
         ]
 
-    r1, r2, r3 = st.columns(3)
+    x1, x2, x3 = st.columns(3)
 
-    r1.metric(
+    x1.metric(
         "Transactions",
         f"{len(related):,}"
     )
 
-    r2.metric(
+    x2.metric(
         "Average Risk",
         f"{related['risk_score'].mean():.1f}"
     )
 
-    r3.metric(
-        "High-risk cases",
+    x3.metric(
+        "High-risk Transactions",
         f"{(related['risk_score'] >= 75).sum():,}"
     )
 
-    st.markdown(
-        '<div class="section-title">'
-        'Related Transactions'
-        '</div>',
-        unsafe_allow_html=True
+    st.subheader(
+        "Related Transactions"
     )
 
-    st.dataframe(
+    related_display = (
         related[
             [
                 "transaction_id",
@@ -1628,45 +1806,55 @@ elif page == "Entity Intelligence":
             "risk_score",
             ascending=False
         )
-        .head(50),
+        .head(50)
+        .copy()
+    )
+
+    related_display[
+        "amount"
+    ] = related_display[
+        "amount"
+    ].map(money)
+
+    related_display[
+        "risk_score"
+    ] = related_display[
+        "risk_score"
+    ].round(1)
+
+    st.dataframe(
+        related_display,
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
     )
 
 
 # ============================================================
-# MODEL & RESULTS
+# MODEL INTELLIGENCE
 # ============================================================
 
-elif page == "Model & Results":
+elif page == "Model Intelligence":
 
-    st.markdown(
-        """
-        <div class="hero">
-
-            <div class="hero-title">
-                Model Intelligence
-            </div>
-
-            <div class="hero-subtitle">
-                Validation evidence from the completed
-                RiskGraph AI modelling pipeline.
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+    st.title(
+        "🧠 Model Intelligence"
     )
+
+    st.subheader(
+        "Evidence from the completed RiskGraph AI "
+        "fraud detection pipeline."
+    )
+
+    st.divider()
 
     st.info(
-        "These metrics are the measured results from the "
-        "completed held-out evaluation."
+        "These are the evaluation results produced by "
+        "the completed notebook pipeline."
     )
 
     c1, c2, c3, c4 = st.columns(4)
 
     c1.metric(
-        "ROC-AUC",
+        "Future Holdout ROC-AUC",
         "99.85%"
     )
 
@@ -1687,11 +1875,8 @@ elif page == "Model & Results":
 
     st.divider()
 
-    st.markdown(
-        '<div class="section-title">'
-        'Anomaly Engine'
-        '</div>',
-        unsafe_allow_html=True
+    st.subheader(
+        "Anomaly Engine"
     )
 
     st.metric(
@@ -1699,22 +1884,21 @@ elif page == "Model & Results":
         "99.12%"
     )
 
-    st.markdown(
-        '<div class="section-title">'
-        'Risk Decision Architecture'
-        '</div>',
-        unsafe_allow_html=True
+    st.divider()
+
+    st.subheader(
+        "RiskGraph Architecture"
     )
 
     architecture = pd.DataFrame(
         {
             "Layer": [
-                "Supervised model",
-                "Behavior anomaly",
-                "Entity intelligence",
-                "Financial exposure",
-                "Risk fusion",
-                "Decision policy",
+                "Fraud Model",
+                "Anomaly Engine",
+                "Entity Graph",
+                "Financial Exposure",
+                "Risk Fusion",
+                "Decision Policy",
             ],
 
             "Output": [
@@ -1731,31 +1915,28 @@ elif page == "Model & Results":
     st.dataframe(
         architecture,
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
     )
 
-    st.markdown(
-        '<div class="section-title">'
-        'Final Decision Policy'
-        '</div>',
-        unsafe_allow_html=True
+    st.subheader(
+        "Final Decision Policy"
     )
 
     policy = pd.DataFrame(
         {
-            "Risk score": [
+            "Risk Score": [
                 "< 60",
                 "60 – 74.99",
                 "≥ 75",
             ],
 
-            "Decision": [
+            "Action": [
                 "APPROVE",
                 "VERIFY",
                 "REVIEW",
             ],
 
-            "Purpose": [
+            "Meaning": [
                 "Low intervention risk",
                 "Additional verification",
                 "Manual investigation",
@@ -1766,14 +1947,13 @@ elif page == "Model & Results":
     st.dataframe(
         policy,
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
     )
 
-    st.markdown(
-        '<div class="section-title">'
-        'Final Policy Evaluation'
-        '</div>',
-        unsafe_allow_html=True
+    st.divider()
+
+    st.subheader(
+        "Final Policy Evaluation"
     )
 
     p1, p2, p3, p4, p5 = st.columns(5)
@@ -1805,24 +1985,24 @@ elif page == "Model & Results":
 
     st.divider()
 
-    st.markdown(
-        "### Business evaluation from final policy"
+    st.subheader(
+        "Final Business Metrics"
     )
 
     b1, b2, b3 = st.columns(3)
 
     b1.metric(
-        "False-positive value",
+        "False-positive Value",
         "₹4,83,752.82"
     )
 
     b2.metric(
-        "Missed-fraud value",
+        "Missed-fraud Value",
         "₹4,292.70"
     )
 
     b3.metric(
-        "Estimated FP cost",
+        "Estimated FP Cost",
         "₹4,837.53"
     )
 
@@ -1838,30 +2018,23 @@ elif page == "Model & Results":
 
 elif page == "Business Impact":
 
-    st.markdown(
-        """
-        <div class="hero">
-
-            <div class="hero-title">
-                Business Impact
-            </div>
-
-            <div class="hero-subtitle">
-                Translate model decisions into financial risk
-                and intervention impact.
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+    st.title(
+        "💰 Business Impact"
     )
+
+    st.subheader(
+        "Translate fraud predictions into financial exposure "
+        "and intervention decisions."
+    )
+
+    st.divider()
 
     baseline_loss = (
         data["expected_fraud_loss"]
         .sum()
     )
 
-    residual_loss = 0
+    residual_loss = 0.0
 
     for _, row in data.iterrows():
 
@@ -1869,14 +2042,20 @@ elif page == "Business Impact":
 
             residual_loss += (
                 row["expected_fraud_loss"]
-                * (1 - VERIFY_FRAUD_REDUCTION)
+                * (
+                    1
+                    - VERIFY_FRAUD_REDUCTION
+                )
             )
 
         elif row["final_action"] == "REVIEW":
 
             residual_loss += (
                 row["expected_fraud_loss"]
-                * (1 - REVIEW_FRAUD_REDUCTION)
+                * (
+                    1
+                    - REVIEW_FRAUD_REDUCTION
+                )
             )
 
         else:
@@ -1891,6 +2070,7 @@ elif page == "Business Impact":
     )
 
     intervention_cost = (
+
         (
             data["final_action"]
             == "VERIFY"
@@ -1910,27 +2090,39 @@ elif page == "Business Impact":
 
     c1.metric(
         "Baseline Expected Loss",
-        money(baseline_loss)
+        money(
+            baseline_loss
+        )
     )
 
     c2.metric(
-        "Residual Loss",
-        money(residual_loss)
+        "Residual Expected Loss",
+        money(
+            residual_loss
+        )
     )
 
     c3.metric(
         "Estimated Loss Avoided",
-        money(loss_avoided)
+        money(
+            loss_avoided
+        )
     )
 
     c4.metric(
         "Intervention Cost",
-        money(intervention_cost)
+        money(
+            intervention_cost
+        )
     )
 
     st.divider()
 
-    summary = (
+    st.subheader(
+        "Decision-level financial exposure"
+    )
+
+    business_table = (
         data
         .groupby("final_action")
         .agg(
@@ -1945,80 +2137,164 @@ elif page == "Business Impact":
             expected_fraud_loss=(
                 "expected_fraud_loss",
                 "sum"
-            )
+            ),
         )
         .reset_index()
     )
 
+    business_table[
+        "transaction_value"
+    ] = business_table[
+        "transaction_value"
+    ].map(money)
+
+    business_table[
+        "expected_fraud_loss"
+    ] = business_table[
+        "expected_fraud_loss"
+    ].map(money)
+
     st.dataframe(
-        summary,
+        business_table,
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
     )
 
     st.warning(
-        "Business intervention costs and fraud-reduction "
-        "assumptions are prototype assumptions used for "
-        "project evaluation."
+        "Financial intervention costs and fraud-reduction "
+        "assumptions are prototype assumptions for project "
+        "evaluation, not production Razorpay figures."
     )
 
 
 # ============================================================
-# TRANSACTIONS
+# TRANSACTIONS / DATA EXPLORER
 # ============================================================
 
 elif page == "Transactions":
 
-    st.markdown(
-        """
-        <div class="hero">
-
-            <div class="hero-title">
-                Transaction Explorer
-            </div>
-
-            <div class="hero-subtitle">
-                Search, filter and export RiskGraph decisions.
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+    st.title(
+        "📊 Transaction Explorer"
     )
 
-    actions = st.multiselect(
-        "Decision",
-        [
-            "APPROVE",
-            "VERIFY",
-            "REVIEW",
-        ],
-        default=[
-            "APPROVE",
-            "VERIFY",
-            "REVIEW",
-        ]
+    st.subheader(
+        "Search, filter and export RiskGraph decisions."
     )
 
-    min_risk = st.slider(
-        "Minimum risk score",
-        0,
-        100,
-        0
+    st.divider()
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+
+        selected_actions = st.multiselect(
+            "Decision",
+            [
+                "APPROVE",
+                "VERIFY",
+                "REVIEW",
+            ],
+            default=[
+                "APPROVE",
+                "VERIFY",
+                "REVIEW",
+            ],
+        )
+
+    with c2:
+
+        minimum_risk = st.slider(
+            "Minimum Risk Score",
+            0,
+            100,
+            0,
+        )
+
+    search_text = st.text_input(
+        "Search transaction / customer / merchant / device / IP",
+        placeholder="Search...",
     )
 
     filtered = data[
         data["final_action"]
-        .isin(actions)
+        .isin(selected_actions)
         &
         (
             data["risk_score"]
-            >= min_risk
+            >= minimum_risk
         )
     ].copy()
 
+    if search_text.strip():
+
+        q = (
+            search_text
+            .strip()
+            .lower()
+        )
+
+        mask = (
+            filtered[
+                "transaction_id"
+            ]
+            .astype(str)
+            .str.lower()
+            .str.contains(
+                q,
+                na=False
+            )
+            |
+
+            filtered[
+                "customer_id"
+            ]
+            .astype(str)
+            .str.lower()
+            .str.contains(
+                q,
+                na=False
+            )
+            |
+
+            filtered[
+                "merchant_id"
+            ]
+            .astype(str)
+            .str.lower()
+            .str.contains(
+                q,
+                na=False
+            )
+            |
+
+            filtered[
+                "device_id"
+            ]
+            .astype(str)
+            .str.lower()
+            .str.contains(
+                q,
+                na=False
+            )
+            |
+
+            filtered[
+                "ip_id"
+            ]
+            .astype(str)
+            .str.lower()
+            .str.contains(
+                q,
+                na=False
+            )
+        )
+
+        filtered = filtered[
+            mask
+        ]
+
     st.metric(
-        "Matching transactions",
+        "Matching Transactions",
         f"{len(filtered):,}"
     )
 
@@ -2038,34 +2314,61 @@ elif page == "Transactions":
         ]
     ].copy()
 
-    display["amount"] = (
-        display["amount"]
-        .map(money)
-    )
+    display[
+        "amount"
+    ] = display[
+        "amount"
+    ].map(money)
 
     display[
         "fraud_probability"
-    ] = (
-        display[
-            "fraud_probability"
-        ].map(pct)
-    )
+    ] = display[
+        "fraud_probability"
+    ].map(percentage)
+
+    display[
+        "anomaly_score"
+    ] = display[
+        "anomaly_score"
+    ].round(1)
+
+    display[
+        "graph_risk_score"
+    ] = display[
+        "graph_risk_score"
+    ].round(1)
+
+    display[
+        "financial_exposure_score"
+    ] = display[
+        "financial_exposure_score"
+    ].round(1)
+
+    display[
+        "risk_score"
+    ] = display[
+        "risk_score"
+    ].round(1)
 
     st.dataframe(
         display,
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
     )
 
-    csv = filtered.to_csv(
+    st.divider()
+
+    csv_data = filtered.to_csv(
         index=False
-    ).encode("utf-8")
+    ).encode(
+        "utf-8"
+    )
 
     st.download_button(
-        "Download RiskGraph Results",
-        data=csv,
+        label="⬇️ Download RiskGraph Results",
+        data=csv_data,
         file_name="riskgraph_results.csv",
-        mime="text/csv"
+        mime="text/csv",
     )
 
 
@@ -2077,5 +2380,5 @@ st.divider()
 
 st.caption(
     "RiskGraph AI · AI Payment Risk Manager · "
-    "Defense-only fraud risk detection and decisioning"
+    "Synthetic-data prototype · Defense-only fraud risk detection"
 )
